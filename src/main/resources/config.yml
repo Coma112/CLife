@@ -1,0 +1,33 @@
+# Every time is taken in seconds!
+
+language: "en" # Supported languages -> hu, de, en
+time: 216000 # Starting time
+damage-per-half-heart: 1800 # Time taken by half heart.
+egapple-time: 1800 # Time given by an eaten enchanted golden apple
+gapple-time: 900 # Time given by an eaten NORMAL golden apple
+
+potions:
+  healing: 1800 # Time given by a used healing potion
+  regeneration: 900 # Time given by a used regeneration potion
+
+color-per-life:
+  dark-green: "60-50"
+  lime: "50-40"
+  yellow: "40-30"
+  orange: "30-20"
+  red: "20-10"
+  violet: "10-0"
+
+database:
+  type: "sqlite" # Supported types -> mysql, sqlite
+  mysql:
+    host: localhost
+    port: 3306
+    database: coma112
+    username: root
+    password: ""
+    # You shouldn't touch this part except if you are familiar with it.
+    ssl: false
+    certificateverification: false
+    poolsize: 10
+    lifetime: 1800000
