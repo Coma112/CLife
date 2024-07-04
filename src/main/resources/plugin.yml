@@ -2,4 +2,7 @@ name: CLife
 version: '${version}'
 main: coma112.clife.CLife
 api-version: '1.21'
-
+authors:
+  - Coma112
+  - B3rcyy
+  - Vulcan Studio
