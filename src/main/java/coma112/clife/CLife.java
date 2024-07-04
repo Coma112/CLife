@@ -34,7 +34,7 @@ public final class CLife extends JavaPlugin {
 
         checkUpdates();
 
-        new Metrics(this, 00000); //BStats ID instead of the 00000
+        new Metrics(this, 22532);
     }
 
     @Override
