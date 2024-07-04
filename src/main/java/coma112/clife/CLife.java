@@ -25,7 +25,6 @@ public final class CLife extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        //Initializing
         saveDefaultConfig();
 
         scheduler = UniversalScheduler.getScheduler(this);
