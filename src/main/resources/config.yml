@@ -6,6 +6,11 @@ damage-per-half-heart: 1800 # Time taken by half heart.
 egapple-time: 1800 # Time given by an eaten enchanted golden apple
 gapple-time: 900 # Time given by an eaten NORMAL golden apple
 
+countdown:
+  time: 10 # Time to countdown before starting the match.
+  title: "&aThe match is about to start in..."
+  subtitle: "&2{time}"
+
 potions:
   healing: 1800 # Time given by a used healing potion
   regeneration: 900 # Time given by a used regeneration potion
@@ -17,6 +22,14 @@ color-per-life:
   orange: "30-20"
   red: "20-10"
   violet: "10-0"
+
+color-name:
+  dark-green: "&2&lDARK GREEN"
+  lime: "&a&lLIME"
+  yellow: "&e&lYELLOW"
+  orange: "&6&lORANGE"
+  red: "&c&lRED"
+  violet: "&d&lVIOLET"
 
 database:
   type: "sqlite" # Supported types -> mysql, sqlite

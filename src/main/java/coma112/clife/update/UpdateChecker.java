@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
+@SuppressWarnings("deprecation")
 public class UpdateChecker {
     private final int resourceId;
 
@@ -18,14 +19,13 @@ public class UpdateChecker {
     }
 
     public void getVersion(final Consumer<String> consumer) {
-        Bukkit.getScheduler().runTaskAsynchronously(CLife.getInstance(), () -> {
+        CLife.getInstance().getScheduler().runTaskAsynchronously(CLife.getInstance(), () -> {
             try {
                 URI uri = new URI("https", "api.spigotmc.org", "/legacy/update.php", "resource=" + this.resourceId + "/~", null);
                 InputStream is = uri.toURL().openStream();
+
                 try (Scanner scanner = new Scanner(is)) {
-                    if (scanner.hasNext()) {
-                        consumer.accept(scanner.next());
-                    }
+                    if (scanner.hasNext()) consumer.accept(scanner.next());
                 }
             } catch (IOException | URISyntaxException exception) {
                 CLife.getInstance().getLogger().info("Unable to check for updates: " + exception.getMessage());

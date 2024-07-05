@@ -10,4 +10,8 @@ public class PlayerUtils {
     public static void sendActionBar(@NotNull Player player, @NotNull String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
+
+    public static void sendTitle(@NotNull Player player, @NotNull String title, @NotNull String subTitle) {
+        player.sendTitle(title, subTitle);
+    }
 }

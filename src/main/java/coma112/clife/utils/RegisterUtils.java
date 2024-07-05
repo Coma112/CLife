@@ -1,6 +1,7 @@
 package coma112.clife.utils;
 
 import coma112.clife.CLife;
+import coma112.clife.commands.CommandLife;
 import org.bukkit.event.Listener;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
@@ -23,7 +24,7 @@ public class RegisterUtils {
 
     public static void registerCommands() {
         BukkitCommandHandler handler = BukkitCommandHandler.create(CLife.getInstance());
-        //handler.register(new CommandReport());
+        handler.register(new CommandLife());
     }
 
     private static Set<Class<? extends Listener>> getListenerClasses() {

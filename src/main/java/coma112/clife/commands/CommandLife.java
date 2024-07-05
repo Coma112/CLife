@@ -2,6 +2,7 @@ package coma112.clife.commands;
 
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.MessageKeys;
+import coma112.clife.managers.Match;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.annotation.Command;
@@ -17,5 +18,11 @@ public class CommandLife {
         CLife.getInstance().getConfiguration().reload();
         //CLife.getDatabaseManager().reconnect();
         sender.sendMessage(MessageKeys.RELOAD.getMessage());
+    }
+
+    @Subcommand("start")
+    @CommandPermission("clife.start")
+    public void start() {
+        new Match();
     }
 }

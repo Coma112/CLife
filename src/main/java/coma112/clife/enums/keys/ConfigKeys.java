@@ -6,6 +6,15 @@ import org.jetbrains.annotations.NotNull;
 
 public enum ConfigKeys {
     LANGUAGE("language"),
+    COLOR_RED("color-name.red"),
+    COLOR_LIME("color-name.lime"),
+    COLOR_DARK_GREEN("color-name.dark-green"),
+    COLOR_YELLOW("color-name.yellow"),
+    COLOR_ORANGE("color-name.orange"),
+    COLOR_VIOLET("color-name.violet"),
+    COUNTDOWN("countdown.time"),
+    COUNTDOWN_TITLE("countdown.title"),
+    COUNTDOWN_SUBTITLE("countdown.subtitle"),
     STARTING_TIME("time");
 
     private final String path;
