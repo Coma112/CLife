@@ -5,6 +5,7 @@ import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskSchedule
 import coma112.clife.config.Config;
 import coma112.clife.enums.LanguageType;
 import coma112.clife.enums.keys.ConfigKeys;
+import coma112.clife.hooks.PlaceholderAPI;
 import coma112.clife.language.Language;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
@@ -32,6 +33,7 @@ public final class CLife extends JavaPlugin {
         initializeComponents();
         registerListenersAndCommands();
 
+        PlaceholderAPI.registerHook();
         checkUpdates();
 
         new Metrics(this, 22532);

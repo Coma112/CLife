@@ -36,6 +36,17 @@ public enum Color {
         };
     }
 
+    public String getColorCode() {
+        return switch (this) {
+            case DARK_GREEN -> "&2";
+            case LIME -> "&a";
+            case YELLOW -> "&e";
+            case ORANGE -> "&6";
+            case RED -> "&c";
+            case VIOLET -> "&d";
+        };
+    }
+
     public String getName() {
         return switch (this) {
             case DARK_GREEN -> ConfigKeys.COLOR_DARK_GREEN.getString();

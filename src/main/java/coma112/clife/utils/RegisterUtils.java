@@ -2,6 +2,7 @@ package coma112.clife.utils;
 
 import coma112.clife.CLife;
 import coma112.clife.commands.CommandLife;
+import coma112.clife.managers.MatchManager;
 import org.bukkit.event.Listener;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
@@ -29,7 +30,7 @@ public class RegisterUtils {
 
     private static Set<Class<? extends Listener>> getListenerClasses() {
         Set<Class<? extends Listener>> listenerClasses = new HashSet<>();
-        //listenerClasses.add(MenuListener.class);
+        listenerClasses.add(MatchManager.class);
         return listenerClasses;
     }
 
