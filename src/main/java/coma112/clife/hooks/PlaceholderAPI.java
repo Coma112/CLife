@@ -2,7 +2,6 @@ package coma112.clife.hooks;
 
 import coma112.clife.CLife;
 import coma112.clife.managers.Match;
-import coma112.clife.managers.MatchManager;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +35,14 @@ public class PlaceholderAPI extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(@NotNull Player player, @NotNull String params) {
-        Match match = MatchManager.getMatch(player);
+        Match match = CLife.getInstance().getMatch(player);
+
+        if (match == null) return "N/A";
 
         return switch (params) {
             case "color_string" -> match.getColor(player).getName();
             case "color_code" -> match.getColor(player).getColorCode();
+            case "time" -> match.getTime(player);
             default -> null;
         };
     }

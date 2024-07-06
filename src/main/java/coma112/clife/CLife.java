@@ -7,9 +7,15 @@ import coma112.clife.enums.LanguageType;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.hooks.PlaceholderAPI;
 import coma112.clife.language.Language;
+import coma112.clife.managers.Match;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static coma112.clife.utils.StartingUtils.*;
 
@@ -18,6 +24,8 @@ public final class CLife extends JavaPlugin {
     private static TaskScheduler scheduler;
     private static Config config;
     private static Language language;
+    @Getter
+    private static final Set<Match> activeMatches = new HashSet<>();
 
     @Override
     public void onLoad() {
@@ -54,6 +62,13 @@ public final class CLife extends JavaPlugin {
 
     public Language getLanguage() {
         return language;
+    }
+
+    public Match getMatch(@NotNull Player player) {
+        for (Match match : activeMatches) {
+            if (match.isInMatch(player)) return match;
+        }
+        return null;
     }
 
     private void initializeComponents() {

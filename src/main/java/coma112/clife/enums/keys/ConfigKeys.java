@@ -13,6 +13,7 @@ public enum ConfigKeys {
     COLOR_ORANGE("color-name.orange"),
     COLOR_VIOLET("color-name.violet"),
     COUNTDOWN("countdown.time"),
+    MINIMUM_PLAYERS("minimum-players"),
     COUNTDOWN_TITLE("countdown.title"),
     COUNTDOWN_SUBTITLE("countdown.subtitle"),
     STARTING_TIME("time");
