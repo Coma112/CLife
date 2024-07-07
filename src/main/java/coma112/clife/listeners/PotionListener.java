@@ -40,5 +40,6 @@ public class PotionListener implements Listener {
                 PlayerUtils.sendTitle(player, "&a+ " + PlayerUtils.formatTime(healing_potion), "");
             }
         }
+
     }
 }

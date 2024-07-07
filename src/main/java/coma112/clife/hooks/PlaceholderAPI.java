@@ -38,7 +38,7 @@ public class PlaceholderAPI extends PlaceholderExpansion {
     public String onPlaceholderRequest(@NotNull Player player, @NotNull String params) {
         Match match = CLife.getInstance().getMatch(player);
 
-        if (match == null) return "-";
+        if (match == null) return "";
 
         return switch (params) {
             case "color_string" -> match.getColor(player).getName();

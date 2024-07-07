@@ -1,9 +1,8 @@
 package coma112.clife.managers;
 
-import coma112.clife.enums.Color;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
+import coma112.clife.enums.Color;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

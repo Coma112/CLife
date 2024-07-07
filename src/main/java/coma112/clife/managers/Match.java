@@ -18,13 +18,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Match {
-    @Getter
-    private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     private final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     private final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     private int countdown;
-    @Getter
-    private Player winner;
+    @Getter private Player winner;
 
     public Match() {
         availablePlayers.addAll(Bukkit.getServer().getOnlinePlayers());

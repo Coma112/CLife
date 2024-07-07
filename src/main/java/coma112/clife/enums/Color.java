@@ -2,8 +2,9 @@ package coma112.clife.enums;
 
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
-import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,13 +22,15 @@ public enum Color {
     // RED -> EVERYONE EXCEPT VIOLET
     // VIOLET -> EVERYONE
 
-
     public static Color fromString(@NotNull String color) {
         for (Color playerColor : values()) if (playerColor.name().equalsIgnoreCase(color)) return playerColor;
         return null;
     }
 
     public static Color getColorForTime(int time) {
+        Color highestColor = DARK_GREEN;
+        int highestUpperLimit = Integer.MIN_VALUE;
+
         for (Color color : values()) {
             String range = CLife.getInstance().getConfiguration().getString("color-per-life." + color.name().toLowerCase().replace("_", "-"));
 
@@ -37,21 +40,16 @@ public enum Color {
                 int upper = Integer.parseInt(limits[0]);
 
                 if (time >= lower && time < upper) return color;
+
+                if (upper > highestUpperLimit) {
+                    highestUpperLimit = upper;
+                    highestColor = color;
+                }
             }
         }
 
+        if (time >= highestUpperLimit) return highestColor;
         return VIOLET;
-    }
-
-    public ChatColor getChatColor() {
-        return switch (this) {
-            case DARK_GREEN -> ChatColor.DARK_GREEN;
-            case LIME -> ChatColor.GREEN;
-            case YELLOW -> ChatColor.YELLOW;
-            case ORANGE -> ChatColor.GOLD;
-            case RED -> ChatColor.RED;
-            case VIOLET -> ChatColor.LIGHT_PURPLE;
-        };
     }
 
     public String getColorCode() {

@@ -16,6 +16,7 @@ public enum ConfigKeys {
     MINIMUM_PLAYERS("minimum-players"),
     COUNTDOWN_TITLE("countdown.title"),
     DAMAGE("damage-per-half-heart"),
+    KILLER_DAMAGE("add-time-per-half-heart"),
     END_TITLE("end.title"),
     END_BROADCAST("end.broadcast"),
     END_SUBTITLE("end.subtitle"),
