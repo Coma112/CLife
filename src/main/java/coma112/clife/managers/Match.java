@@ -4,31 +4,24 @@ import coma112.clife.CLife;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.events.MatchStartedEvent;
+import coma112.clife.processor.MessageProcessor;
 import coma112.clife.utils.PlayerUtils;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.Executors.newScheduledThreadPool;
-
-@SuppressWarnings("deprecation")
-public class Match implements Listener {
+public class Match {
     @Getter
     private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     private final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     private final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
-    private final Map<Player, Match> matchByPlayer = new ConcurrentHashMap<>();
+    private int countdown;
 
     public Match() {
         availablePlayers.addAll(Bukkit.getServer().getOnlinePlayers());
@@ -55,61 +48,62 @@ public class Match implements Listener {
 
     public void endMatch() {
         players.clear();
-        matchByPlayer.clear();
         CLife.getActiveMatches().remove(this);
-    }
-
-    public Match getMatchByPlayer(@NotNull Player player) {
-        return matchByPlayer.get(player);
     }
 
     public boolean isInMatch(@NotNull Player player) {
         return players.contains(player);
     }
 
+    public void addTime(@NotNull Player player, int timeToAdd) {
+        playerTimes.put(player, playerTimes.getOrDefault(player, 0) + timeToAdd);
+    }
+
+    public void removeTime(@NotNull Player player, int timeToRemove) {
+        playerTimes.put(player, playerTimes.getOrDefault(player, 0) - timeToRemove);
+    }
+
     public Color getColor(@NotNull Player player) {
         for (Color color : Color.values()) {
             if (color.getPlayer() != null && color.getPlayer().equals(player)) return color;
         }
-
         return null;
     }
 
-    public String getTime(@NotNull Player player) {
-        return formatTime(playerTimes.getOrDefault(player, 0));
+    public int getTime(@NotNull Player player) {
+        return playerTimes.getOrDefault(player, 0);
     }
 
     private void selectPlayersForMatch() {
         Collections.shuffle(availablePlayers);
-        int numPlayersToAdd = Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), availablePlayers.size());
-        for (int i = 0; i < numPlayersToAdd; i++) {
+
+        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), availablePlayers.size()); i++) {
             Player player = availablePlayers.get(i);
             players.add(player);
-            matchByPlayer.put(player, this);
         }
     }
 
     private void startPlayerCountdown() {
-        ScheduledExecutorService scheduler = newScheduledThreadPool(1);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                synchronized (playerTimes) {
+                    players.forEach(player -> {
+                        int remaining = playerTimes.getOrDefault(player, 0);
 
-        Runnable task = () -> {
-            for (Player player : players) {
-                int remainingTime = playerTimes.getOrDefault(player, 0);
+                        if (remaining > 0) playerTimes.put(player, remaining - 1);
+                    });
 
-                if (remainingTime > 0) playerTimes.put(player, remainingTime - 1);
+                    updatePlayerColor();
+                }
             }
-        };
-
-        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
+        }.runTaskTimer(CLife.getInstance(), 0L, 20L);
     }
 
-
     private void startCountdown() {
-        ScheduledExecutorService scheduler = newScheduledThreadPool(1);
+        countdown = ConfigKeys.COUNTDOWN.getInt();
 
-        Runnable task = new Runnable() {
-            int countdown = ConfigKeys.COUNTDOWN.getInt();
-
+        new BukkitRunnable() {
             @Override
             public void run() {
                 if (countdown > 0) {
@@ -123,40 +117,36 @@ public class Match implements Listener {
                                     .replace("{time}", String.valueOf(countdown))));
                     countdown--;
                 } else {
-                    scheduler.shutdown();
+                    cancel();
                     Bukkit.getServer().getPluginManager().callEvent(new MatchStartedEvent(Match.this));
                     startPlayerCountdown();
                 }
             }
-        };
-
-        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
+        }.runTaskTimer(CLife.getInstance(), 0L, 20L);
     }
 
     private void startActionBarUpdate() {
-        ScheduledExecutorService scheduler = newScheduledThreadPool(1);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                players.forEach(player -> {
+                    Color playerColor = getColor(player);
 
-        Runnable task = () -> {
-            for (Player player : players) {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getTime(player)));
+                    PlayerUtils.sendActionBar(player, ConfigKeys.ACTION_BAR.getString()
+                            .replace("{time}", PlayerUtils.formatTime(getTime(player)))
+                            .replace("{color}", playerColor != null ? playerColor.getColorCode() : "&2"));
+                });
             }
-        };
-
-        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
+        }.runTaskTimer(CLife.getInstance(), 0L, 20L);
     }
 
-    private String formatTime(int seconds) {
-        int hours = seconds / 3600;
-        int minutes = (seconds % 3600) / 60;
-        int remainingSeconds = seconds % 60;
+    private void updatePlayerColor() {
+        synchronized (playerTimes) {
+            players.forEach(player -> {
+                Color color = Color.getColorForTime(playerTimes.getOrDefault(player, 0));
 
-        return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds);
-    }
-
-    @EventHandler
-    public void onMatchStarted(MatchStartedEvent event) {
-        Match match = event.getMatch();
-
-        match.getPlayers().forEach(player -> playerTimes.put(player, ConfigKeys.STARTING_TIME.getInt()));
+                if (color != null) color.setPlayer(player);
+            });
+        }
     }
 }

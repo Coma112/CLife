@@ -15,8 +15,15 @@ public enum ConfigKeys {
     COUNTDOWN("countdown.time"),
     MINIMUM_PLAYERS("minimum-players"),
     COUNTDOWN_TITLE("countdown.title"),
+    DAMAGE("damage-per-half-heart"),
     COUNTDOWN_SUBTITLE("countdown.subtitle"),
+    ACTION_BAR("action-bar"),
+    ENCHANTED_GOLDEN_APPLE_TIME("egapple-time"),
+    GOLDEN_APPLE_TIME("gapple-time"),
+    HEALING_POTION("potions.healing"),
+    REGENERATION_POTION("potions.regeneration"),
     STARTING_TIME("time");
+
 
     private final String path;
 

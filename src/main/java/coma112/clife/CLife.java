@@ -42,7 +42,6 @@ public final class CLife extends JavaPlugin {
         registerListenersAndCommands();
 
         PlaceholderAPI.registerHook();
-        checkUpdates();
 
         new Metrics(this, 22532);
     }

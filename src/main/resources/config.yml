@@ -9,7 +9,7 @@ gapple-time: 900 # Time given by an eaten NORMAL golden apple
 countdown:
   time: 3 # Time to countdown before starting the match.
   title: "&aThe match is about to start in..."
-  subtitle: "&2{time}"
+  subtitle: "&2{time} &aseconds!"
 
 potions:
   healing: 1800 # Time given by a used healing potion
@@ -17,13 +17,15 @@ potions:
 
 minimum-players: 1 # Minimum amount of players to start a match.
 
+action-bar: "{color}{time}"
+
 color-per-life:
-  dark-green: "60-50"
-  lime: "50-40"
-  yellow: "40-30"
-  orange: "30-20"
-  red: "20-10"
-  violet: "10-0"
+  dark-green: "216000-180000"
+  lime: "180000-144000"
+  yellow: "144000-108000"
+  orange: "108000-72000"
+  red: "72000-36000"
+  violet: "36000-0"
 
 color-name:
   dark-green: "&2&lDARK GREEN"
