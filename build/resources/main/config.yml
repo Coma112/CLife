@@ -2,8 +2,8 @@
 
 language: "en" # Supported languages -> hu, de, en
 time: 216000 # Starting time
-damage-per-half-heart: 1800 # Time taken by half heart.
-add-time-per-half-heart: 1800 # Time given by half heart
+damage-per-half-heart: 120 # Time taken by half heart.
+add-time-per-half-heart: 60 # Time given by half heart
 egapple-time: 1800 # Time given by an eaten enchanted golden apple
 gapple-time: 900 # Time given by an eaten NORMAL golden apple
 

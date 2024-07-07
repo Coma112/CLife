@@ -20,9 +20,7 @@ public class DamageListener implements Listener{
             Player damager = (Player) event.getDamager();
 
             if (match != null) {
-                match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()));
                 match.addTime(damager, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
-                PlayerUtils.sendTitle(victim, "&4- " + PlayerUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
                 PlayerUtils.sendTitle(damager, "&a+ " + PlayerUtils.formatTime(ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()), "");
             }
         }
