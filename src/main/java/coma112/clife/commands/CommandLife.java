@@ -4,6 +4,7 @@ import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
+import coma112.clife.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,15 +30,28 @@ public class CommandLife {
         Match match = CLife.getInstance().getMatch(player);
 
         if (Bukkit.getOnlinePlayers().size() < ConfigKeys.MINIMUM_PLAYERS.getInt()) {
-            player.sendMessage("Not enough players to start match!");
+            player.sendMessage(MessageKeys.NOT_ENOUGH_PLAYERS.getMessage().replace("{minimum}", String.valueOf(ConfigKeys.MINIMUM_PLAYERS.getInt() - Bukkit.getOnlinePlayers().size())));
             return;
         }
 
         if (match != null && match.isInMatch(player)) {
-            player.sendMessage("Match is already in progress!");
+            player.sendMessage(MessageKeys.ALREADY_IN_MATCH.getMessage());
             return;
         }
 
         new Match();
+    }
+
+    @Subcommand("stop")
+    @CommandPermission("clife.stop")
+    public void stop(@NotNull Player player) {
+        Match match = CLife.getInstance().getMatch(player);
+
+        if (match != null && !match.isInMatch(player)) {
+            player.sendMessage(MessageKeys.NOT_IN_MATCH.getMessage());
+            return;
+        }
+
+        if (match != null) match.endMatch();
     }
 }

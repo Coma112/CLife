@@ -5,7 +5,6 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -22,7 +21,6 @@ public enum Color {
     // RED -> EVERYONE EXCEPT VIOLET
     // VIOLET -> EVERYONE
 
-    private Player player;
 
     public static Color fromString(@NotNull String color) {
         for (Color playerColor : values()) if (playerColor.name().equalsIgnoreCase(color)) return playerColor;
@@ -38,10 +36,7 @@ public enum Color {
                 int lower = Integer.parseInt(limits[1]);
                 int upper = Integer.parseInt(limits[0]);
 
-                if (time >= lower && time < upper) {
-                    LifeLogger.info(color + " " + range + " " + upper + " " +lower);
-                    return color;
-                }
+                if (time >= lower && time < upper) return color;
             }
         }
 
@@ -79,9 +74,5 @@ public enum Color {
             case RED -> ConfigKeys.COLOR_RED.getString();
             case VIOLET -> ConfigKeys.COLOR_VIOLET.getString();
         };
-    }
-
-    public void setPlayer(@NotNull Player player) {
-        this.player = player;
     }
 }

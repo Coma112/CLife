@@ -23,6 +23,8 @@ public class Match {
     private final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     private final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     private int countdown;
+    @Getter
+    private Player winner;
 
     public Match() {
         availablePlayers.addAll(Bukkit.getServer().getOnlinePlayers());
@@ -48,7 +50,9 @@ public class Match {
     }
 
     public void endMatch() {
+        players.forEach(player -> CLife.getInstance().getColorManager().removeColor(player));
         players.clear();
+        winner = null;
         CLife.getActiveMatches().remove(this);
     }
 
@@ -65,10 +69,7 @@ public class Match {
     }
 
     public Color getColor(@NotNull Player player) {
-        for (Color color : Color.values()) {
-            if (color.getPlayer() != null && color.getPlayer().equals(player)) return color;
-        }
-        return null;
+        return CLife.getInstance().getColorManager().getColor(player);
     }
 
     public int getTime(@NotNull Player player) {
@@ -78,10 +79,7 @@ public class Match {
     private void selectPlayersForMatch() {
         Collections.shuffle(availablePlayers);
 
-        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), availablePlayers.size()); i++) {
-            Player player = availablePlayers.get(i);
-            players.add(player);
-        }
+        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), availablePlayers.size()); i++) players.add(availablePlayers.get(i));
     }
 
     private void startPlayerCountdown() {
@@ -96,6 +94,7 @@ public class Match {
                     });
 
                     updatePlayerColor();
+                    checkForWinner();
                 }
             }
         }.runTaskTimer(CLife.getInstance(), 0L, 20L);
@@ -145,13 +144,42 @@ public class Match {
         synchronized (playerTimes) {
             players.forEach(player -> {
                 Color color = Color.getColorForTime(playerTimes.getOrDefault(player, 0));
-                Color currentPlayerColor = getColor(player);
 
-                    if (!Objects.equals(currentPlayerColor, color)) {
-                        LifeLogger.info("Setting color for " + player.getName() + " to " + color.name());
-                        color.setPlayer(player);
-                }
+                if (!Objects.equals(getColor(player), color)) CLife.getInstance().getColorManager().setColor(player, color);
             });
+        }
+    }
+
+    private void checkForWinner() {
+        long alivePlayers = players
+                .stream()
+                .filter(player -> playerTimes.getOrDefault(player, 0) > 0)
+                .count();
+
+        if (alivePlayers <= 1) {
+            winner = players
+                    .stream()
+                    .filter(player -> playerTimes.getOrDefault(player, 0) > 0)
+                    .findFirst()
+                    .orElse(null);
+
+            if (winner != null) {
+                getPlayers().forEach(player -> player.sendMessage(ConfigKeys.END_BROADCAST
+                        .getString()
+                        .replace("{winner}", getWinner().getName())));
+
+                getPlayers().forEach(players -> {
+                    PlayerUtils.sendTitle(players,
+                            ConfigKeys.END_TITLE
+                                    .getString()
+                                    .replace("{winner}", getWinner().getName()),
+
+                            ConfigKeys.END_SUBTITLE
+                                    .getString()
+                                    .replace("{winner}", getWinner().getName()));
+                });
+            }
+            endMatch();
         }
     }
 }

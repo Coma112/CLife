@@ -1,2 +1,5 @@
 messages:
   reload: "&a&lLIFE &8| &aI have successfully reloaded the files!"
+  not-enough-players: "&a&lLIFE &8| &cYou cannot start the game, you still need {minimum} players!"
+  already-in-match: "&a&lLIFE &8| &cYou are already in a match!"
+  not-in-match: "&a&lLIFE &8| &cYou aren't in a match!"

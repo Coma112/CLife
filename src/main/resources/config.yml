@@ -11,11 +11,16 @@ countdown:
   title: "&aThe match is about to start in..."
   subtitle: "&2{time} &aseconds!"
 
+end:
+  title: "&c&lGAME OVER"
+  subtitle: "&e&lTHE WINNER IS &6{winner}"
+  broadcast: "&6{winner} &ahas won the match! &2GG!"
+
 potions:
   healing: 1800 # Time given by a used healing potion
   regeneration: 900 # Time given by a used regeneration potion
 
-minimum-players: 1 # Minimum amount of players to start a match.
+minimum-players: 2 # Minimum amount of players to start a match.
 
 action-bar: "{color}{time}"
 
