@@ -5,6 +5,7 @@ import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.events.MatchStartedEvent;
 import coma112.clife.processor.MessageProcessor;
+import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.PlayerUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -144,8 +145,12 @@ public class Match {
         synchronized (playerTimes) {
             players.forEach(player -> {
                 Color color = Color.getColorForTime(playerTimes.getOrDefault(player, 0));
+                Color currentPlayerColor = getColor(player);
 
-                if (color != null) color.setPlayer(player);
+                    if (!Objects.equals(currentPlayerColor, color)) {
+                        LifeLogger.info("Setting color for " + player.getName() + " to " + color.name());
+                        color.setPlayer(player);
+                }
             });
         }
     }

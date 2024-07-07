@@ -3,10 +3,12 @@ package coma112.clife.enums;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.utils.LifeLogger;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
 @SuppressWarnings("deprecation")
 public enum Color {
     DARK_GREEN,
@@ -36,7 +38,10 @@ public enum Color {
                 int lower = Integer.parseInt(limits[1]);
                 int upper = Integer.parseInt(limits[0]);
 
-                if (time < upper && time >= lower) return color;
+                if (time >= lower && time < upper) {
+                    LifeLogger.info(color + " " + range + " " + upper + " " +lower);
+                    return color;
+                }
             }
         }
 
@@ -74,10 +79,6 @@ public enum Color {
             case RED -> ConfigKeys.COLOR_RED.getString();
             case VIOLET -> ConfigKeys.COLOR_VIOLET.getString();
         };
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 
     public void setPlayer(@NotNull Player player) {

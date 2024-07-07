@@ -5,7 +5,6 @@ import coma112.clife.commands.CommandLife;
 import coma112.clife.listeners.AppleListener;
 import coma112.clife.listeners.DamageListener;
 import coma112.clife.listeners.PotionListener;
-import coma112.clife.managers.Match;
 import org.bukkit.event.Listener;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
