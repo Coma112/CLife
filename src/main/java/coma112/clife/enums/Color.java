@@ -3,13 +3,9 @@ package coma112.clife.enums;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import lombok.Getter;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-@SuppressWarnings("deprecation")
 public enum Color {
     DARK_GREEN,
     LIME,

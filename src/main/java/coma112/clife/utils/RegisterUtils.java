@@ -3,6 +3,7 @@ package coma112.clife.utils;
 import coma112.clife.CLife;
 import coma112.clife.commands.CommandLife;
 import coma112.clife.listeners.AppleListener;
+import coma112.clife.listeners.AttackListener;
 import coma112.clife.listeners.DamageListener;
 import coma112.clife.listeners.PotionListener;
 import org.bukkit.event.Listener;
@@ -35,6 +36,7 @@ public class RegisterUtils {
         listenerClasses.add(AppleListener.class);
         listenerClasses.add(DamageListener.class);
         listenerClasses.add(PotionListener.class);
+        //listenerClasses.add(AttackListener.class);
         return listenerClasses;
     }
 

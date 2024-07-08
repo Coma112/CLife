@@ -15,9 +15,8 @@ import java.util.Objects;
 public class DamageListener implements Listener{
     @EventHandler
     public void onEntityDamage(final EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player victim) {
+        if (event.getEntity() instanceof Player victim && event.getDamager() instanceof Player damager) {
             Match match = CLife.getInstance().getMatch(victim);
-            Player damager = (Player) event.getDamager();
 
             if (match != null) {
                 match.addTime(damager, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
