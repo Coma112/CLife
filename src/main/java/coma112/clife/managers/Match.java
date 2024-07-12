@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Match {
     @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
+    @Getter private final List<Player> spectators = Collections.synchronizedList(new ArrayList<>());
     private final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     private final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     private int countdown;
