@@ -23,15 +23,15 @@ potions:
 
 minimum-players: 2 # Minimum amount of players to start a match.
 
-action-bar: "{color}{time}"
+action-bar: "{color}{time}" # Information to show on the Actionbar
 
 color-per-life:
-  dark-green: "216000-180000"
-  lime: "180000-144000"
-  yellow: "144000-108000"
-  orange: "108000-72000"
-  red: "72000-36000"
-  violet: "36000-0"
+  dark-green: "216000-180000" # 60H-50H
+  lime: "180000-144000" # 50H-40H
+  yellow: "144000-108000" # 40H-30H
+  orange: "108000-72000" # 30H-20H
+  red: "72000-36000" # 20H-10H
+  violet: "36000-0" # 10H-0
 
 color-name:
   dark-green: "&2&lDARK GREEN"
