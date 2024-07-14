@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.Objects;
 
@@ -35,6 +36,18 @@ public class DamageListener implements Listener{
                 match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()));
                 PlayerUtils.sendTitle(victim, "&4- " + PlayerUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(final PlayerDeathEvent event) {
+        Player victim = event.getEntity();
+        Player killer = victim.getKiller();
+        Match match = CLife.getInstance().getMatch(victim);
+
+        if (match != null && killer != null && match.isInMatch(killer)) {
+            CLife.getDatabase().addDeath(victim);
+            CLife.getDatabase().addKill(killer);
         }
     }
 }

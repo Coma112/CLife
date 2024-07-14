@@ -42,7 +42,7 @@ color-name:
   violet: "&d&lVIOLET"
 
 database:
-  type: "sqlite" # Supported types -> mysql, sqlite
+  type: "mysql" # Supported types -> mysql, sqlite
   mysql:
     host: localhost
     port: 3306

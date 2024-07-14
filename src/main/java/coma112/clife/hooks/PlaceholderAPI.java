@@ -44,6 +44,9 @@ public class PlaceholderAPI extends PlaceholderExpansion {
             case "color_string" -> match.getColor(player).getName();
             case "color_code" -> match.getColor(player).getColorCode();
             case "time" -> PlayerUtils.formatTime(match.getTime(player));
+            case "wins" -> String.valueOf(CLife.getDatabase().getWins(player));
+            case "deaths" -> String.valueOf(CLife.getDatabase().getDeaths(player));
+            case "kills" -> String.valueOf(CLife.getDatabase().getKills(player));
             default -> null;
         };
     }

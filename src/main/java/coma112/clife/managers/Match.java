@@ -90,6 +90,10 @@ public class Match {
                         int remaining = playerTimes.getOrDefault(player, 0);
 
                         if (remaining > 0) playerTimes.put(player, remaining - 1);
+                        else if (remaining == 0) {
+                            players.remove(player);
+                            CLife.getInstance().getColorManager().removeColor(player);
+                        }
                     });
 
                     updatePlayerColor();
@@ -167,16 +171,16 @@ public class Match {
                         .getString()
                         .replace("{winner}", getWinner().getName())));
 
-                getPlayers().forEach(players -> {
-                    PlayerUtils.sendTitle(players,
-                            ConfigKeys.END_TITLE
-                                    .getString()
-                                    .replace("{winner}", getWinner().getName()),
+                getPlayers().forEach(players -> PlayerUtils.sendTitle(players,
+                        ConfigKeys.END_TITLE
+                                .getString()
+                                .replace("{winner}", getWinner().getName()),
 
-                            ConfigKeys.END_SUBTITLE
-                                    .getString()
-                                    .replace("{winner}", getWinner().getName()));
-                });
+                        ConfigKeys.END_SUBTITLE
+                                .getString()
+                                .replace("{winner}", getWinner().getName())));
+
+                CLife.getDatabase().addWin(winner);
             }
             endMatch();
         }
