@@ -20,7 +20,7 @@ public class CommandLife {
     public void reload(@NotNull CommandSender sender) {
         CLife.getInstance().getLanguage().reload();
         CLife.getInstance().getConfiguration().reload();
-        //CLife.getDatabaseManager().reconnect();
+        CLife.getDatabase().reconnect();
         sender.sendMessage(MessageKeys.RELOAD.getMessage());
     }
 

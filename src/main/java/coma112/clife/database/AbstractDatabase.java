@@ -8,6 +8,12 @@ public abstract class AbstractDatabase {
 
     public abstract void disconnect();
 
+    public abstract void createTable();
+
+    public abstract void createPlayer(@NotNull Player player);
+
+    public abstract boolean exists(@NotNull Player player);
+
     public abstract void addDeath(@NotNull Player player);
 
     public abstract void addKill(@NotNull Player player);
@@ -19,4 +25,6 @@ public abstract class AbstractDatabase {
     public abstract int getKills(@NotNull Player player);
 
     public abstract int getWins(@NotNull Player player);
+
+    public abstract void reconnect();
 }

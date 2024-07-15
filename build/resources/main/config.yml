@@ -21,7 +21,7 @@ potions:
   healing: 1800 # Time given by a used healing potion
   regeneration: 900 # Time given by a used regeneration potion
 
-minimum-players: 2 # Minimum amount of players to start a match.
+minimum-players: 2 # The amount of players it should find when the match starts
 
 action-bar: "{color}{time}" # Information to show on the Actionbar
 

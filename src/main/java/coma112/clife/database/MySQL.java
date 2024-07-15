@@ -2,6 +2,7 @@ package coma112.clife.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import coma112.clife.CLife;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -12,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -31,7 +33,7 @@ public class MySQL extends AbstractDatabase {
         int poolSize = section.getInt("poolsize");
         int maxLifetime = section.getInt("lifetime");
 
-        hikariConfig.setPoolName("ReportsPool");
+        hikariConfig.setPoolName("LifePool");
         hikariConfig.setMaximumPoolSize(poolSize);
         hikariConfig.setMaxLifetime(maxLifetime * 1000L);
         hikariConfig.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database);
@@ -69,13 +71,49 @@ public class MySQL extends AbstractDatabase {
         }
     }
 
+    @Override
     public void createTable() {
-        String query = "CREATE TABLE IF NOT EXISTS life (ID INT AUTO_INCREMENT PRIMARY KEY, PLAYER VARCHAR(255) NOT NULL, WINS DEFAULT 0, KILLS DEFAULT 0, DEATHS DEFAULT 0)";
+        String query = "CREATE TABLE IF NOT EXISTS life (ID INT AUTO_INCREMENT PRIMARY KEY, PLAYER VARCHAR(255) NOT NULL, WINS INT DEFAULT 0, KILLS INT DEFAULT 0, DEATHS INT DEFAULT 0)";
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
             preparedStatement.execute();
         } catch (SQLException exception) {
             LifeLogger.error(exception.getMessage());
+        }
+    }
+
+    @Override
+    public void createPlayer(@NotNull Player player) {
+        String query = "INSERT IGNORE INTO life (PLAYER) VALUES (?)";
+
+        try {
+            if (!exists(player)) {
+                try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                    preparedStatement.setString(1, player.getName());
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    @Override
+    public boolean exists(@NotNull Player player) {
+        String query = "SELECT * FROM life WHERE PLAYER = ?";
+
+        try {
+            if (!getConnection().isValid(2))
+                reconnect();
+
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setString(1, player.getName());
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                return resultSet.next();
+            }
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
@@ -198,4 +236,15 @@ public class MySQL extends AbstractDatabase {
 
         return 0;
     }
+
+    @Override
+    public void reconnect() {
+        try {
+            if (getConnection() != null && !getConnection().isClosed()) getConnection().close();
+            new MySQL(Objects.requireNonNull(CLife.getInstance().getConfiguration().getSection("database.mysql")));
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+    }
+
 }

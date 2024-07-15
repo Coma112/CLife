@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum ConfigKeys {
     LANGUAGE("language"),
-    DATABASE("database"),
+    DATABASE("database.type"),
     COLOR_RED("color-name.red"),
     COLOR_LIME("color-name.lime"),
     COLOR_DARK_GREEN("color-name.dark-green"),

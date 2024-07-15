@@ -3,6 +3,7 @@ package coma112.clife;
 import coma112.clife.config.Config;
 import coma112.clife.database.AbstractDatabase;
 import coma112.clife.database.MySQL;
+import coma112.clife.database.SQLite;
 import coma112.clife.enums.DatabaseType;
 import coma112.clife.enums.LanguageType;
 import coma112.clife.enums.keys.ConfigKeys;
@@ -95,13 +96,13 @@ public final class CLife extends JavaPlugin {
                     mysql.createTable();
                 }
 
-                //case SQLITE, sqlite -> {
-                //    databaseManager = new SQLite();
-                //    SQLite sqlite = (SQLite) databaseManager;
-                //    sqlite.createTable();
-                //}
+                case SQLITE, sqlite -> {
+                    database = new SQLite();
+                    SQLite sqlite = (SQLite) database;
+                    sqlite.createTable();
+                }
             }
-        } catch (SQLException exception) {
+        } catch (SQLException | ClassNotFoundException exception) {
             LifeLogger.error(exception.getMessage());
         }
     }

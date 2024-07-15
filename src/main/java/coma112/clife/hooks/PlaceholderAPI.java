@@ -38,16 +38,26 @@ public class PlaceholderAPI extends PlaceholderExpansion {
     public String onPlaceholderRequest(@NotNull Player player, @NotNull String params) {
         Match match = CLife.getInstance().getMatch(player);
 
-        if (match == null) return "";
-
         return switch (params) {
-            case "color_string" -> match.getColor(player).getName();
-            case "color_code" -> match.getColor(player).getColorCode();
-            case "time" -> PlayerUtils.formatTime(match.getTime(player));
+            case "color_string" -> {
+                if (match == null) yield "";
+                else yield match.getColor(player).getName();
+            }
+
+            case "color_code" -> {
+                if (match == null) yield "";
+                else yield match.getColor(player).getColorCode();
+            }
+
+            case "time" -> {
+                if (match == null) yield "";
+                else yield PlayerUtils.formatTime(match.getTime(player));
+            }
+
             case "wins" -> String.valueOf(CLife.getDatabase().getWins(player));
             case "deaths" -> String.valueOf(CLife.getDatabase().getDeaths(player));
             case "kills" -> String.valueOf(CLife.getDatabase().getKills(player));
-            default -> null;
+            default -> throw new IllegalStateException("Unexpected value: " + params);
         };
     }
 
