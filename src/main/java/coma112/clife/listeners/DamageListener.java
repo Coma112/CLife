@@ -11,10 +11,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class DamageListener implements Listener{
+public class DamageListener implements Listener {
     @EventHandler
     public void onEntityDamage(final EntityDamageByEntityEvent event) {
+
         if (event.getEntity() instanceof Player victim && event.getDamager() instanceof Player damager) {
+
             Match match = CLife.getInstance().getMatch(victim);
 
             if (match != null) {
@@ -24,13 +26,17 @@ public class DamageListener implements Listener{
                 }
 
                 match.addTime(damager, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
+                match.removeTime(victim, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
                 PlayerUtils.sendTitle(damager, "&a+ " + PlayerUtils.formatTime(ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()), "");
+                PlayerUtils.sendTitle(victim, "&4- " + PlayerUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
             }
         }
     }
 
+
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent event) {
+        if (event instanceof EntityDamageByEntityEvent) return;
 
         if (event.getEntity() instanceof Player victim) {
             Match match = CLife.getInstance().getMatch(victim);
@@ -39,8 +45,8 @@ public class DamageListener implements Listener{
                 match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()));
                 PlayerUtils.sendTitle(victim, "&4- " + PlayerUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
             }
+            }
         }
-    }
 
     @EventHandler
     public void onPlayerDeath(final PlayerDeathEvent event) {

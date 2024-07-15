@@ -4,6 +4,7 @@ import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
+import coma112.clife.utils.LifeLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,7 +57,7 @@ public class CommandLife {
         match.endMatch();
     }
 
-    @Subcommand("change time")
+    @Subcommand("change")
     @CommandPermission("clife.changetime")
     public void changeTime(@NotNull Player player, @NotNull Player target, @NotNull String prefix, int time) {
         Match match = CLife.getInstance().getMatch(target);
@@ -76,8 +77,14 @@ public class CommandLife {
         if (prefix.equals("+") || !prefix.equals("-")) return;
 
         switch (prefix) {
-            case "+" -> match.addTime(player, time);
-            case "-" -> match.removeTime(player, time);
+            case "+" -> {
+                match.addTime(target, time);
+                LifeLogger.info("Added " + time + " seconds to " + target.getName());
+            }
+            case "-" -> {
+                match.removeTime(target, time);
+                LifeLogger.info("Removed " + time + " seconds from " + target.getName());
+            }
         }
     }
 }

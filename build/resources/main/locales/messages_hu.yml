@@ -1,0 +1,6 @@
+messages:
+  reload: "&a&lLIFE &8| &aSikeresen újratöltöttem a fájlokat!"
+  not-enough-players: "&a&lLIFE &8| &cNem indíthatod el a játékot, szükséged van még {minimum} játékosra!"
+  already-in-match: "&a&lLIFE &8| &cTe már meccsben van!"
+  not-in-match: "&a&lLIFE &8| &cNem vagy még meccsben!"
+  target-not-in-match: "&a&lLIFE &8| &cA kijelölt nincsen még meccsben!"

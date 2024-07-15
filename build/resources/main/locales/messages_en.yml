@@ -3,3 +3,4 @@ messages:
   not-enough-players: "&a&lLIFE &8| &cYou cannot start the game, you still need {minimum} players!"
   already-in-match: "&a&lLIFE &8| &cYou are already in a match!"
   not-in-match: "&a&lLIFE &8| &cYou aren't in a match!"
+  target-not-in-match: "&a&lLIFE &8| &cThe target isn't in a match!"

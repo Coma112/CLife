@@ -3,6 +3,7 @@ package coma112.clife.enums;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import lombok.Getter;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -76,6 +77,13 @@ public enum Color {
             case YELLOW, ORANGE -> victimColor == DARK_GREEN || victimColor == LIME;
             case RED -> victimColor != VIOLET;
             case VIOLET -> true;
+        };
+    }
+
+    public boolean isAttackable(@NotNull Color color) {
+        return switch (this) {
+            case DARK_GREEN, LIME -> false;
+            case YELLOW, ORANGE, RED, VIOLET -> true;
         };
     }
 }

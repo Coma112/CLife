@@ -3,10 +3,7 @@ version: '1.0-DEV'
 main: coma112.clife.CLife
 api-version: '1.20'
 
-authors:
-  - Coma112
-  - B3rcyy
-  - Vulcan Studio
+author: "Coma112 & B3rcyy (Vulcan Studio)"
 
 depend:
   - PlaceholderAPI
