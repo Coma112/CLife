@@ -1,0 +1,6 @@
+messages:
+  reload: "&a&lLIFE &8| &aDateien erfolgreich neu geladen!"
+  not-enough-players: "&a&lLIFE &8| &cDu kannst das Spiel nicht starten, es werden noch {minimum} Spieler benötigt!"
+  already-in-match: "&a&lLIFE &8| &cDu bist bereits in einem Spiel!"
+  not-in-match: "&a&lLIFE &8| &cDu bist noch nicht in einem Spiel!"
+  target-not-in-match: "&a&lLIFE &8| &cDas ausgewählte Ziel ist noch nicht in einem Spiel!"
