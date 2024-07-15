@@ -1,7 +1,6 @@
 package coma112.clife.listeners;
+
 import coma112.clife.CLife;
-import coma112.clife.config.Config;
-import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.PlayerUtils;
@@ -11,8 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-
-import java.util.Objects;
 
 public class DamageListener implements Listener{
     @EventHandler

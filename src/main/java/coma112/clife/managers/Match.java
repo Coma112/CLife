@@ -3,9 +3,6 @@ package coma112.clife.managers;
 import coma112.clife.CLife;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
-import coma112.clife.events.MatchStartedEvent;
-import coma112.clife.processor.MessageProcessor;
-import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.PlayerUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -121,7 +118,6 @@ public class Match {
                     countdown--;
                 } else {
                     cancel();
-                    Bukkit.getServer().getPluginManager().callEvent(new MatchStartedEvent(Match.this));
                     startPlayerCountdown();
                 }
             }

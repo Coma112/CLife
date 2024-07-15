@@ -37,7 +37,6 @@ public class RegisterUtils {
         listenerClasses.add(DamageListener.class);
         listenerClasses.add(PotionListener.class);
         listenerClasses.add(DatabaseListener.class);
-        //listenerClasses.add(AttackListener.class);
         return listenerClasses;
     }
 
