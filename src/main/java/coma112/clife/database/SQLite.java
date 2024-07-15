@@ -49,7 +49,7 @@ public class SQLite extends AbstractDatabase {
 
     @Override
     public void createPlayer(@NotNull Player player) {
-        String query = "INSERT IGNORE INTO life (PLAYER) VALUES (?)";
+        String query = "INSERT INTO life (PLAYER) VALUES (?)";
 
         try {
             if (!exists(player)) {
