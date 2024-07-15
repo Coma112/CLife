@@ -69,4 +69,13 @@ public enum Color {
             case VIOLET -> ConfigKeys.COLOR_VIOLET.getString();
         };
     }
+
+    public boolean canAttack(@NotNull Color victimColor) {
+        return switch (this) {
+            case DARK_GREEN, LIME -> false;
+            case YELLOW, ORANGE -> victimColor == DARK_GREEN || victimColor == LIME;
+            case RED -> victimColor != VIOLET;
+            case VIOLET -> true;
+        };
+    }
 }

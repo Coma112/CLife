@@ -1,6 +1,7 @@
 package coma112.clife.listeners;
 import coma112.clife.CLife;
 import coma112.clife.config.Config;
+import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.PlayerUtils;
@@ -20,6 +21,11 @@ public class DamageListener implements Listener{
             Match match = CLife.getInstance().getMatch(victim);
 
             if (match != null) {
+                if (!match.getColor(damager).canAttack(match.getColor(victim))) {
+                    event.setCancelled(true);
+                    return;
+                }
+
                 match.addTime(damager, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
                 PlayerUtils.sendTitle(damager, "&a+ " + PlayerUtils.formatTime(ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()), "");
             }

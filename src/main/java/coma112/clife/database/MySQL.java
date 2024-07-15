@@ -246,5 +246,4 @@ public class MySQL extends AbstractDatabase {
             LifeLogger.error(exception.getMessage());
         }
     }
-
 }

@@ -47,11 +47,13 @@ public class CommandLife {
     public void stop(@NotNull Player player) {
         Match match = CLife.getInstance().getMatch(player);
 
-        if (match != null && !match.isInMatch(player)) {
+        if (match == null) return;
+
+        if (!match.isInMatch(player)) {
             player.sendMessage(MessageKeys.NOT_IN_MATCH.getMessage());
             return;
         }
 
-        if (match != null) match.endMatch();
+        match.endMatch();
     }
 }
