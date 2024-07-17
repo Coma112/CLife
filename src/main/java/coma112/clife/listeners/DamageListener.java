@@ -2,7 +2,6 @@ package coma112.clife.listeners;
 
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
-import coma112.clife.events.MatchEndEvent;
 import coma112.clife.events.MatchKillEvent;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.PlayerUtils;
@@ -16,7 +15,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 public class DamageListener implements Listener {
     @EventHandler
     public void onEntityDamage(final EntityDamageByEntityEvent event) {
-
         if (event.getEntity() instanceof Player victim && event.getDamager() instanceof Player damager) {
 
             Match match = CLife.getInstance().getMatch(victim);

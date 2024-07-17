@@ -15,15 +15,6 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 @Command({"clife", "life"})
 public class CommandLife {
-    @Subcommand("reload")
-    @CommandPermission("clife.reload")
-    public void reload(@NotNull CommandSender sender) {
-        CLife.getInstance().getLanguage().reload();
-        CLife.getInstance().getConfiguration().reload();
-        CLife.getDatabase().reconnect();
-        sender.sendMessage(MessageKeys.RELOAD.getMessage());
-    }
-
     @Subcommand("start")
     @CommandPermission("clife.start")
     public void start(@NotNull Player player) {

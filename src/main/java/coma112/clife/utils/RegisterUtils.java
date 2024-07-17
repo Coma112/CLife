@@ -2,10 +2,7 @@ package coma112.clife.utils;
 
 import coma112.clife.CLife;
 import coma112.clife.commands.CommandLife;
-import coma112.clife.listeners.AppleListener;
-import coma112.clife.listeners.DamageListener;
-import coma112.clife.listeners.DatabaseListener;
-import coma112.clife.listeners.PotionListener;
+import coma112.clife.listeners.*;
 import coma112.clife.listeners.webhook.MatchEndListener;
 import coma112.clife.listeners.webhook.MatchKillListener;
 import coma112.clife.listeners.webhook.MatchStartListener;
@@ -43,6 +40,8 @@ public class RegisterUtils {
         listenerClasses.add(MatchEndListener.class);
         listenerClasses.add(MatchKillListener.class);
         listenerClasses.add(DatabaseListener.class);
+        listenerClasses.add(DisconnectListener.class);
+        listenerClasses.add(SpectatorListener.class);
         return listenerClasses;
     }
 
