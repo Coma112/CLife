@@ -54,3 +54,49 @@ database:
     certificateverification: false
     poolsize: 10
     lifetime: 1800000
+
+# Webhook
+# webhook.enabled -> You can enable and disable the webhook feature
+# webhook.url -> Discord Webhook URL
+
+webhook:
+  match-start-embed:
+    enabled: false
+    url: "WEBHOOK URL HERE!!!"
+    title: "NEW MATCH!"
+    description: "Players in the match: {count}"
+    color: "GREEN"
+    author-name: ""
+    author-url: ""
+    author-icon: ""
+    footer-text: "SENT BY CLIFE"
+    footer-icon: ""
+    thumbnail: ""
+    image: ""
+  match-end-embed:
+    enabled: false
+    url: "WEBHOOK URL HERE!!!"
+    title: "MATCH ENDED!"
+    description: "Winner: {winner}"
+    color: "GREEN"
+    author-name: ""
+    author-url: ""
+    author-icon: ""
+    footer-text: "SENT BY CLIFE"
+    footer-icon: ""
+    thumbnail: ""
+    image: ""
+  match-kill-embed:
+    enabled: false
+    url: "WEBHOOK URL HERE!!!"
+    title: "NEW KILL"
+    description: "**{killer}** killed **{victim}**"
+    color: "GREEN"
+    author-name: ""
+    author-url: ""
+    author-icon: ""
+    footer-text: "SENT BY CLIFE"
+    footer-icon: ""
+    thumbnail: ""
+    image: ""
+

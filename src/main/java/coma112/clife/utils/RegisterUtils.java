@@ -6,6 +6,9 @@ import coma112.clife.listeners.AppleListener;
 import coma112.clife.listeners.DamageListener;
 import coma112.clife.listeners.DatabaseListener;
 import coma112.clife.listeners.PotionListener;
+import coma112.clife.listeners.webhook.MatchEndListener;
+import coma112.clife.listeners.webhook.MatchKillListener;
+import coma112.clife.listeners.webhook.MatchStartListener;
 import org.bukkit.event.Listener;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
@@ -36,6 +39,9 @@ public class RegisterUtils {
         listenerClasses.add(AppleListener.class);
         listenerClasses.add(DamageListener.class);
         listenerClasses.add(PotionListener.class);
+        listenerClasses.add(MatchStartListener.class);
+        listenerClasses.add(MatchEndListener.class);
+        listenerClasses.add(MatchKillListener.class);
         listenerClasses.add(DatabaseListener.class);
         return listenerClasses;
     }

@@ -3,6 +3,8 @@ package coma112.clife.managers;
 import coma112.clife.CLife;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
+import coma112.clife.events.MatchEndEvent;
+import coma112.clife.events.MatchStartEvent;
 import coma112.clife.utils.PlayerUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -16,18 +18,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Match {
     @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
-    @Getter private final List<Player> spectators = Collections.synchronizedList(new ArrayList<>());
+    @Getter private Player winner;
     private final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     private final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     private int countdown;
-    @Getter private Player winner;
 
     public Match() {
         availablePlayers.addAll(Bukkit.getServer().getOnlinePlayers());
         selectPlayersForMatch();
         startCountdown();
 
-        players.forEach(player -> {
+        getPlayers().forEach(player -> {
             player.getInventory().clear();
             player.getInventory().setArmorContents(null);
             player.setHealth(20.0);
@@ -46,14 +47,14 @@ public class Match {
     }
 
     public void endMatch() {
-        players.forEach(player -> CLife.getInstance().getColorManager().removeColor(player));
-        players.clear();
+        getPlayers().forEach(player -> CLife.getInstance().getColorManager().removeColor(player));
+        getPlayers().clear();
         winner = null;
         CLife.getActiveMatches().remove(this);
     }
 
     public boolean isInMatch(@NotNull Player player) {
-        return players.contains(player);
+        return getPlayers().contains(player);
     }
 
     public void addTime(@NotNull Player player, int timeToAdd) {
@@ -75,7 +76,7 @@ public class Match {
     private void selectPlayersForMatch() {
         Collections.shuffle(availablePlayers);
 
-        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), availablePlayers.size()); i++) players.add(availablePlayers.get(i));
+        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), availablePlayers.size()); i++) getPlayers().add(availablePlayers.get(i));
     }
 
     private void startPlayerCountdown() {
@@ -83,12 +84,12 @@ public class Match {
             @Override
             public void run() {
                 synchronized (playerTimes) {
-                    players.forEach(player -> {
+                    getPlayers().forEach(player -> {
                         int remaining = playerTimes.getOrDefault(player, 0);
 
                         if (remaining > 0) playerTimes.put(player, remaining - 1);
                         else if (remaining == 0) {
-                            players.remove(player);
+                            getPlayers().remove(player);
                             CLife.getInstance().getColorManager().removeColor(player);
                         }
                     });
@@ -107,7 +108,7 @@ public class Match {
             @Override
             public void run() {
                 if (countdown > 0) {
-                    players.forEach(player -> PlayerUtils.sendTitle(player,
+                    getPlayers().forEach(player -> PlayerUtils.sendTitle(player,
                             ConfigKeys.COUNTDOWN_TITLE
                                     .getString()
                                     .replace("{time}", String.valueOf(countdown)),
@@ -119,6 +120,7 @@ public class Match {
                 } else {
                     cancel();
                     startPlayerCountdown();
+                    CLife.getInstance().getServer().getPluginManager().callEvent(new MatchStartEvent(Match.this));
                 }
             }
         }.runTaskTimer(CLife.getInstance(), 0L, 20L);
@@ -128,7 +130,7 @@ public class Match {
         new BukkitRunnable() {
             @Override
             public void run() {
-                players.forEach(player -> {
+                getPlayers().forEach(player -> {
                     Color playerColor = getColor(player);
 
                     PlayerUtils.sendActionBar(player, ConfigKeys.ACTION_BAR.getString()
@@ -141,7 +143,7 @@ public class Match {
 
     private void updatePlayerColor() {
         synchronized (playerTimes) {
-            players.forEach(player -> {
+            getPlayers().forEach(player -> {
                 Color color = Color.getColorForTime(playerTimes.getOrDefault(player, 0));
 
                 if (!Objects.equals(getColor(player), color)) CLife.getInstance().getColorManager().setColor(player, color);
@@ -150,19 +152,19 @@ public class Match {
     }
 
     private void checkForWinner() {
-        long alivePlayers = players
+        long alivePlayers = getPlayers()
                 .stream()
                 .filter(player -> playerTimes.getOrDefault(player, 0) > 0)
                 .count();
 
         if (alivePlayers <= 1) {
-            winner = players
+            winner = getPlayers()
                     .stream()
                     .filter(player -> playerTimes.getOrDefault(player, 0) > 0)
                     .findFirst()
                     .orElse(null);
 
-            if (winner != null) {
+            if (getWinner() != null) {
                 getPlayers().forEach(player -> player.sendMessage(ConfigKeys.END_BROADCAST
                         .getString()
                         .replace("{winner}", getWinner().getName())));
@@ -176,7 +178,8 @@ public class Match {
                                 .getString()
                                 .replace("{winner}", getWinner().getName())));
 
-                CLife.getDatabase().addWin(winner);
+                CLife.getDatabase().addWin(getWinner());
+                CLife.getInstance().getServer().getPluginManager().callEvent(new MatchEndEvent(Match.this));
             }
             endMatch();
         }

@@ -106,5 +106,4 @@ public final class CLife extends JavaPlugin {
             LifeLogger.error(exception.getMessage());
         }
     }
-
 }

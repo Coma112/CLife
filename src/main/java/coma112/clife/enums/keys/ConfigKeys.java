@@ -27,7 +27,46 @@ public enum ConfigKeys {
     GOLDEN_APPLE_TIME("gapple-time"),
     HEALING_POTION("potions.healing"),
     REGENERATION_POTION("potions.regeneration"),
-    STARTING_TIME("time");
+    STARTING_TIME("time"),
+
+    WEBHOOK_MATCH_START_EMBED_URL("webhook.match-start-embed.url"),
+    WEBHOOK_MATCH_START_EMBED_ENABLED("webhook.match-start-embed.enabled"),
+    WEBHOOK_MATCH_START_EMBED_TITLE("webhook.match-start-embed.title"),
+    WEBHOOK_MATCH_START_EMBED_DESCRIPTION("webhook.match-start-embed.description"),
+    WEBHOOK_MATCH_START_EMBED_COLOR("webhook.match-start-embed.color"),
+    WEBHOOK_MATCH_START_EMBED_AUTHOR_NAME("webhook.match-start-embed.author-name"),
+    WEBHOOK_MATCH_START_EMBED_AUTHOR_URL("webhook.match-start-embed.author-url"),
+    WEBHOOK_MATCH_START_EMBED_AUTHOR_ICON("webhook.match-start-embed.author-icon"),
+    WEBHOOK_MATCH_START_EMBED_FOOTER_TEXT("webhook.match-start-embed.footer-text"),
+    WEBHOOK_MATCH_START_EMBED_FOOTER_ICON("webhook.match-start-embed.footer-icon"),
+    WEBHOOK_MATCH_START_EMBED_THUMBNAIL("webhook.match-start-embed.thumbnail"),
+    WEBHOOK_MATCH_START_EMBED_IMAGE("webhook.match-start-embed.image"),
+
+    WEBHOOK_MATCH_END_EMBED_URL("webhook.match-end-embed.url"),
+    WEBHOOK_MATCH_END_EMBED_ENABLED("webhook.match-end-embed.enabled"),
+    WEBHOOK_MATCH_END_EMBED_TITLE("webhook.match-end-embed.title"),
+    WEBHOOK_MATCH_END_EMBED_DESCRIPTION("webhook.match-end-embed.description"),
+    WEBHOOK_MATCH_END_EMBED_COLOR("webhook.match-end-embed.color"),
+    WEBHOOK_MATCH_END_EMBED_AUTHOR_NAME("webhook.match-end-embed.author-name"),
+    WEBHOOK_MATCH_END_EMBED_AUTHOR_URL("webhook.match-end-embed.author-url"),
+    WEBHOOK_MATCH_END_EMBED_AUTHOR_ICON("webhook.match-end-embed.author-icon"),
+    WEBHOOK_MATCH_END_EMBED_FOOTER_TEXT("webhook.match-end-embed.footer-text"),
+    WEBHOOK_MATCH_END_EMBED_FOOTER_ICON("webhook.match-end-embed.footer-icon"),
+    WEBHOOK_MATCH_END_EMBED_THUMBNAIL("webhook.match-end-embed.thumbnail"),
+    WEBHOOK_MATCH_END_EMBED_IMAGE("webhook.match-end-embed.image"),
+
+    WEBHOOK_MATCH_KILL_EMBED_URL("webhook.match-kill-embed.url"),
+    WEBHOOK_MATCH_KILL_EMBED_ENABLED("webhook.match-kill-embed.enabled"),
+    WEBHOOK_MATCH_KILL_EMBED_TITLE("webhook.match-kill-embed.title"),
+    WEBHOOK_MATCH_KILL_EMBED_DESCRIPTION("webhook.match-kill-embed.description"),
+    WEBHOOK_MATCH_KILL_EMBED_COLOR("webhook.match-kill-embed.color"),
+    WEBHOOK_MATCH_KILL_EMBED_AUTHOR_NAME("webhook.match-kill-embed.author-name"),
+    WEBHOOK_MATCH_KILL_EMBED_AUTHOR_URL("webhook.match-kill-embed.author-url"),
+    WEBHOOK_MATCH_KILL_EMBED_AUTHOR_ICON("webhook.match-kill-embed.author-icon"),
+    WEBHOOK_MATCH_KILL_EMBED_FOOTER_TEXT("webhook.match-kill-embed.footer-text"),
+    WEBHOOK_MATCH_KILL_EMBED_FOOTER_ICON("webhook.match-kill-embed.footer-icon"),
+    WEBHOOK_MATCH_KILL_EMBED_THUMBNAIL("webhook.match-kill-embed.thumbnail"),
+    WEBHOOK_MATCH_KILL_EMBED_IMAGE("webhook.match-kill-embed.image");
 
 
     private final String path;
