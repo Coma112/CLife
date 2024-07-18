@@ -1,5 +1,5 @@
 name: CLife
-version: '1.0.0'
+version: '1.0.1'
 main: coma112.clife.CLife
 api-version: '1.20'
 

@@ -49,6 +49,18 @@ public enum Color {
         return VIOLET;
     }
 
+    public static int getUpperLimit(@NotNull Color color) {
+        String range = CLife.getInstance().getConfiguration().getString("color-per-life." + color.name().toLowerCase().replace("_", "-"));
+
+        if (range != null) {
+            String[] limits = range.split("-");
+            return Integer.parseInt(limits[0]);
+        }
+
+        return 0;
+    }
+
+
     public String getColorCode() {
         return switch (this) {
             case DARK_GREEN -> "&2";
@@ -77,13 +89,6 @@ public enum Color {
             case YELLOW, ORANGE -> victimColor == DARK_GREEN || victimColor == LIME;
             case RED -> victimColor != VIOLET;
             case VIOLET -> true;
-        };
-    }
-
-    public boolean isAttackable(@NotNull Color color) {
-        return switch (this) {
-            case DARK_GREEN, LIME -> false;
-            case YELLOW, ORANGE, RED, VIOLET -> true;
         };
     }
 }

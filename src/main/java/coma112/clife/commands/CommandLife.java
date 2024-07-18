@@ -1,17 +1,19 @@
 package coma112.clife.commands;
 
 import coma112.clife.CLife;
+import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
+
+import static coma112.clife.enums.Color.getUpperLimit;
 
 @Command({"clife", "life"})
 public class CommandLife {
@@ -65,8 +67,6 @@ public class CommandLife {
             return;
         }
 
-        if (prefix.equals("+") || !prefix.equals("-")) return;
-
         switch (prefix) {
             case "+" -> {
                 match.addTime(target, time);
@@ -76,6 +76,33 @@ public class CommandLife {
                 match.removeTime(target, time);
                 LifeLogger.info("Removed " + time + " seconds from " + target.getName());
             }
+        }
+    }
+
+    @Subcommand("setcolor")
+    @CommandPermission("clife.setcolor")
+    public void setColor(@NotNull Player player, @NotNull Player target, @NotNull Color color) {
+        Match match = CLife.getInstance().getMatch(target);
+
+        if (match == null) return;
+
+        if (!match.isInMatch(player)) {
+            player.sendMessage(MessageKeys.NOT_IN_MATCH.getMessage());
+            return;
+        }
+
+        if (!match.isInMatch(target)) {
+            player.sendMessage(MessageKeys.TARGET_NOT_IN_MATCH.getMessage());
+            return;
+        }
+
+        switch (color) {
+            case DARK_GREEN -> match.setTime(target, getUpperLimit(Color.DARK_GREEN));
+            case LIME -> match.setTime(target, getUpperLimit(Color.LIME));
+            case YELLOW -> match.setTime(target, getUpperLimit(Color.YELLOW));
+            case ORANGE -> match.setTime(target, getUpperLimit(Color.ORANGE));
+            case RED -> match.setTime(target, getUpperLimit(Color.RED));
+            case VIOLET -> match.setTime(target, getUpperLimit(Color.VIOLET));
         }
     }
 }

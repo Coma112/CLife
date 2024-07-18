@@ -88,6 +88,10 @@ public class Match {
         playerTimes.put(player, playerTimes.getOrDefault(player, 0) - timeToRemove);
     }
 
+    public void setTime(@NotNull Player player, int time) {
+        playerTimes.put(player, time);
+    }
+
     public Color getColor(@NotNull Player player) {
         return CLife.getInstance().getColorManager().getColor(player);
     }
