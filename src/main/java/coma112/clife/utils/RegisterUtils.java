@@ -42,6 +42,7 @@ public class RegisterUtils {
         listenerClasses.add(DatabaseListener.class);
         listenerClasses.add(DisconnectListener.class);
         listenerClasses.add(SpectatorListener.class);
+        listenerClasses.add(MovementListener.class);
         return listenerClasses;
     }
 

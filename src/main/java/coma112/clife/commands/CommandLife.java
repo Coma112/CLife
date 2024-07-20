@@ -6,6 +6,7 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
+import coma112.clife.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -104,5 +105,18 @@ public class CommandLife {
             case RED -> match.setTime(target, getUpperLimit(Color.RED));
             case VIOLET -> match.setTime(target, getUpperLimit(Color.VIOLET));
         }
+    }
+
+    @Subcommand("setcenter")
+    @CommandPermission("clife.setcenter")
+    public void setCenter(@NotNull Player player) {
+        CLife.getInstance().getConfiguration().set("match-center", PlayerUtils.convertLocationToString(player.getLocation()));
+    }
+
+    @Subcommand("setradius")
+    @CommandPermission("clife.setradius")
+    public void setRadius(@NotNull Player player, double radius) {
+        if (radius <= 0) return;
+        CLife.getInstance().getConfiguration().set("match-radius", radius);
     }
 }

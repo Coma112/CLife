@@ -6,10 +6,13 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.events.MatchEndEvent;
 import coma112.clife.events.MatchSpectatorEvent;
 import coma112.clife.events.MatchStartEvent;
+import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.PlayerUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -21,13 +24,14 @@ public class Match {
     @Getter public static final Map<String, Match> activeMatchesById = new ConcurrentHashMap<>();
     @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     @Getter private final List<Player> spectators = Collections.synchronizedList(new ArrayList<>());
+    @Getter public static final List<Player> startingPlayers = Collections.synchronizedList(new ArrayList<>());
     @Getter public static final Map<String, String> defeatedPlayers = new ConcurrentHashMap<>();
     @Getter private Player winner;
+    @Getter public static final String id = "MatchID";
+    @Getter private final Set<String> disconnectedSpectators = Collections.synchronizedSet(new HashSet<>());
     public final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     public final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
-    @Getter private final Set<String> disconnectedSpectators = Collections.synchronizedSet(new HashSet<>());
     private int countdown;
-    @Getter public static final String id = "MatchID";
 
     public Match() {
         availablePlayers.addAll(Bukkit.getServer().getOnlinePlayers());
@@ -138,6 +142,7 @@ public class Match {
 
     private void startCountdown() {
         countdown = ConfigKeys.COUNTDOWN.getInt();
+        getStartingPlayers().addAll(getPlayers());
 
         new BukkitRunnable() {
             @Override
@@ -154,7 +159,9 @@ public class Match {
                     countdown--;
                 } else {
                     cancel();
+                    randomTeleport();
                     startPlayerCountdown();
+                    getStartingPlayers().clear();
                     CLife.getInstance().getServer().getPluginManager().callEvent(new MatchStartEvent(Match.this));
                 }
             }
@@ -220,5 +227,53 @@ public class Match {
             }
             endMatch();
         }
+    }
+
+    private void randomTeleport() {
+        Location center = PlayerUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center"));
+        double radius = CLife.getInstance().getConfiguration().getYml().getDouble("match-radius");
+
+        if (center == null) {
+            LifeLogger.warn("Match center location is not configured correctly. Cannot teleport players.");
+            return;
+        }
+
+        getPlayers().forEach(player -> {
+            boolean validLocation = false;
+
+            while (!validLocation) {
+                double angle = Math.random() * Math.PI * 2;
+                double xOffset = Math.cos(angle) * (Math.random() * radius);
+                double zOffset = Math.sin(angle) * (Math.random() * radius);
+
+                Location teleportLocation = center.clone().add(xOffset, 0, zOffset);
+                teleportLocation.setY(center.getWorld().getHighestBlockYAt(teleportLocation));
+
+                if (isValidLocation(teleportLocation)) {
+                    validLocation = true;
+                    player.teleport(teleportLocation);
+                }
+            }
+        });
+    }
+
+    private boolean isValidLocation(@NotNull Location location) {
+        if (location.getY() > location.getWorld().getMaxHeight()) {
+            return false;
+        }
+
+        Material belowBlock = location.clone().subtract(0, 1, 0).getBlock().getType();
+
+        switch (belowBlock) {
+            case WATER, LAVA -> {
+                return false;
+            }
+        }
+
+        if (location.getBlock().getType().isSolid()) {
+            return false;
+        }
+
+        return location.clone().add(0, -1, 0).getBlock().getType() != Material.AIR;
     }
 }

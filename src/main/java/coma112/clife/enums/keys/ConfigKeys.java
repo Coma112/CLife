@@ -2,6 +2,7 @@ package coma112.clife.enums.keys;
 
 import coma112.clife.CLife;
 import coma112.clife.processor.MessageProcessor;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 public enum ConfigKeys {
@@ -85,5 +86,13 @@ public enum ConfigKeys {
 
     public int getInt() {
         return CLife.getInstance().getConfiguration().getInt(path);
+    }
+
+    public Location getLocation() {
+        return CLife.getInstance().getConfiguration().getYml().getLocation(path);
+    }
+
+    public double getDouble() {
+        return CLife.getInstance().getConfiguration().getYml().getDouble(path);
     }
 }
