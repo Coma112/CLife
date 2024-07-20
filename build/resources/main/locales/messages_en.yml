@@ -4,3 +4,7 @@ messages:
   already-in-match: "&a&lLIFE &8| &cYou are already in a match!"
   not-in-match: "&a&lLIFE &8| &cYou aren't in a match!"
   target-not-in-match: "&a&lLIFE &8| &cThe target isn't in a match!"
+  cant-be-null: "&a&lLIFE &8| &cThe number can't be 0 or lower!"
+  successful-radius: "&a&lLIFE &8| &aYou have successfully set the radius!"
+  successful-center: "&a&lLIFE &8| &aYou have successfully set the center!"
+  successful-setcolor: "&a&lLIFE &8| &aYou have successfully set the color of {target} to {color}!"

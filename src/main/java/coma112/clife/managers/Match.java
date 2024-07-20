@@ -240,20 +240,21 @@ public class Match {
 
         getPlayers().forEach(player -> {
             boolean validLocation = false;
+            Location teleportLocation = null;
 
             while (!validLocation) {
                 double angle = Math.random() * Math.PI * 2;
-                double xOffset = Math.cos(angle) * (Math.random() * radius);
-                double zOffset = Math.sin(angle) * (Math.random() * radius);
+                double distance = Math.random() * radius;
+                double xOffset = Math.cos(angle) * distance;
+                double zOffset = Math.sin(angle) * distance;
 
-                Location teleportLocation = center.clone().add(xOffset, 0, zOffset);
+                teleportLocation = center.clone().add(xOffset, 0, zOffset);
                 teleportLocation.setY(center.getWorld().getHighestBlockYAt(teleportLocation));
 
-                if (isValidLocation(teleportLocation)) {
-                    validLocation = true;
-                    player.teleport(teleportLocation);
-                }
+                if (isValidLocation(teleportLocation)) validLocation = true;
             }
+
+            player.teleport(teleportLocation);
         });
     }
 
@@ -263,17 +264,12 @@ public class Match {
         }
 
         Material belowBlock = location.clone().subtract(0, 1, 0).getBlock().getType();
+        Material currentBlock = location.getBlock().getType();
+        Material aboveBlock = location.clone().add(0, 1, 0).getBlock().getType();
 
-        switch (belowBlock) {
-            case WATER, LAVA -> {
-                return false;
-            }
-        }
-
-        if (location.getBlock().getType().isSolid()) {
-            return false;
-        }
-
-        return location.clone().add(0, -1, 0).getBlock().getType() != Material.AIR;
+        return !belowBlock.equals(Material.WATER) && !belowBlock.equals(Material.LAVA) &&
+                !currentBlock.isSolid() && !aboveBlock.isSolid() &&
+                belowBlock.isSolid();
     }
+
 }

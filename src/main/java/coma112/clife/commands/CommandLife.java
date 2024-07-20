@@ -14,6 +14,8 @@ import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.Map;
+
 import static coma112.clife.enums.Color.getUpperLimit;
 
 @Command({"clife", "life"})
@@ -97,26 +99,39 @@ public class CommandLife {
             return;
         }
 
-        switch (color) {
-            case DARK_GREEN -> match.setTime(target, getUpperLimit(Color.DARK_GREEN));
-            case LIME -> match.setTime(target, getUpperLimit(Color.LIME));
-            case YELLOW -> match.setTime(target, getUpperLimit(Color.YELLOW));
-            case ORANGE -> match.setTime(target, getUpperLimit(Color.ORANGE));
-            case RED -> match.setTime(target, getUpperLimit(Color.RED));
-            case VIOLET -> match.setTime(target, getUpperLimit(Color.VIOLET));
-        }
+        updateMatchColor(match, player, target, color);
     }
 
     @Subcommand("setcenter")
     @CommandPermission("clife.setcenter")
     public void setCenter(@NotNull Player player) {
         CLife.getInstance().getConfiguration().set("match-center", PlayerUtils.convertLocationToString(player.getLocation()));
+        player.sendMessage(MessageKeys.SUCCESSFUL_CENTER.getMessage());
     }
 
     @Subcommand("setradius")
     @CommandPermission("clife.setradius")
     public void setRadius(@NotNull Player player, double radius) {
-        if (radius <= 0) return;
+        if (radius <= 0) {
+            player.sendMessage(MessageKeys.CANT_BE_NULL.getMessage());
+            return;
+        }
+
         CLife.getInstance().getConfiguration().set("match-radius", radius);
+        player.sendMessage(MessageKeys.SUCCESSFUL_RADIUS.getMessage());
+    }
+
+    private void updateMatchColor(@NotNull Match match, @NotNull Player player, @NotNull Player target, @NotNull Color color) {
+        Map<Color, String> colorMessages = Map.of(
+                Color.DARK_GREEN, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.DARK_GREEN.getName()).replace("{target}", target.getName()),
+                Color.LIME, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.LIME.getName()).replace("{target}", target.getName()),
+                Color.YELLOW, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.YELLOW.getName()).replace("{target}", target.getName()),
+                Color.ORANGE, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.ORANGE.getName()).replace("{target}", target.getName()),
+                Color.RED, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.RED.getName()).replace("{target}", target.getName()),
+                Color.VIOLET, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.VIOLET.getName()).replace("{target}", target.getName())
+        );
+
+        match.setTime(target, getUpperLimit(color));
+        player.sendMessage(colorMessages.get(color).replace("{target}", target.getName()));
     }
 }
