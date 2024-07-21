@@ -3,8 +3,10 @@ package coma112.clife.enums;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 public enum Color {
@@ -15,12 +17,17 @@ public enum Color {
     RED,
     VIOLET;
 
-    // YELLOW & ORANGE -> DARK GREEN & LIME
-    // RED -> EVERYONE EXCEPT VIOLET
-    // VIOLET -> EVERYONE
+    private static final Map<Color, List<Color>> attackRules = new HashMap<>();
+    private static final Map<Color, List<Color>> immunityRules = new HashMap<>();
+
+    static {
+        loadAttackRules();
+    }
 
     public static Color fromString(@NotNull String color) {
-        for (Color playerColor : values()) if (playerColor.name().equalsIgnoreCase(color)) return playerColor;
+        for (Color playerColor : values()) {
+            if (playerColor.name().equalsIgnoreCase(color)) return playerColor;
+        }
         return null;
     }
 
@@ -84,11 +91,49 @@ public enum Color {
     }
 
     public boolean canAttack(@NotNull Color victimColor) {
-        return switch (this) {
-            case DARK_GREEN, LIME -> false;
-            case YELLOW, ORANGE -> victimColor == DARK_GREEN || victimColor == LIME;
-            case RED -> victimColor != VIOLET;
-            case VIOLET -> true;
-        };
+        List<Color> allowedVictims = attackRules.getOrDefault(this, Collections.emptyList());
+        List<Color> immuneVictims = immunityRules.getOrDefault(this, Collections.emptyList());
+
+        if (!allowedVictims.isEmpty()) return allowedVictims.contains(victimColor);
+        else if (!immuneVictims.isEmpty()) return !immuneVictims.contains(victimColor);
+
+        return false;
+    }
+
+    private static void loadAttackRules() {
+        String attackConfig = CLife.getInstance().getConfiguration().getString("attack_rule");
+
+        if (attackConfig != null) {
+            String[] rules = attackConfig.split(";");
+
+            for (String rule : rules) {
+                if (rule.contains("->")) {
+                    String[] parts = rule.split("->");
+
+                    if (parts.length == 2) {
+                        Color attacker = Color.fromString(parts[0].trim());
+                        List<Color> victims = Arrays
+                                .stream(parts[1].split(","))
+                                .map(String::trim)
+                                .map(Color::fromString)
+                                .collect(Collectors.toList());
+
+                        if (attacker != null) attackRules.put(attacker, victims);
+                    }
+                } else if (rule.contains("!->")) {
+                    String[] parts = rule.split("!->");
+
+                    if (parts.length == 2) {
+                        Color attacker = Color.fromString(parts[0].trim());
+                        List<Color> immunities = Arrays.stream(parts[1].split(","))
+                                .map(String::trim)
+                                .map(Color::fromString)
+                                .collect(Collectors.toList());
+
+                        if (attacker != null) immunityRules.put(attacker, immunities);
+                    }
+                }
+            }
+        }
     }
 }

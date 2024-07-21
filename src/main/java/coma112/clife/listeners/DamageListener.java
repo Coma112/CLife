@@ -20,7 +20,7 @@ public class DamageListener implements Listener {
             Match match = CLife.getInstance().getMatch(victim);
 
             if (match != null) {
-                if (!match.getColor(damager).canAttack(match.getColor(victim))) {
+                if (!ConfigKeys.EVERYONE_CAN_ATTACK.getBoolean() && !match.getColor(damager).canAttack(match.getColor(victim))) {
                     event.setCancelled(true);
                     return;
                 }

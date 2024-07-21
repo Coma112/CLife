@@ -41,6 +41,12 @@ color-name:
   red: "&c&lRED"
   violet: "&d&lVIOLET"
 
+everyone-can-attack: true # If this is true then the rule below doesn't apply.
+
+attack_rule: "yellow->dark_green,lime;orange->dark_green,lime;red!->violet;violet->dark_green,lime,yellow,orange,red,violet"
+# This is an example rule from the video
+# The rule says that: YELLOW can ONLY attack DARK_GREEN AND LIME. ORANGE can ONLY attack DARK_GREEN AND LIME. RED can attack EVERYONE EXCEPT VIOLET. VIOLET can attack EVERYONE
+
 database:
   type: "sqlite" # Supported types -> mysql, sqlite
   mysql:
