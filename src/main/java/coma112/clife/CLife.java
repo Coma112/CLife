@@ -1,5 +1,7 @@
 package coma112.clife;
 
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import coma112.clife.config.Config;
 import coma112.clife.database.AbstractDatabase;
 import coma112.clife.database.MySQL;
@@ -32,6 +34,7 @@ public final class CLife extends JavaPlugin {
     private static ColorManager colorManager;
     private static Config config;
     private static Language language;
+    private static TaskScheduler scheduler;
 
     @Override
     public void onLoad() {
@@ -42,10 +45,11 @@ public final class CLife extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
+        scheduler = UniversalScheduler.getScheduler(this);
+
         initializeComponents();
         registerListenersAndCommands();
         initializeDatabaseManager();
-        loadBadBlocks();
 
         PlaceholderAPI.registerHook();
 
@@ -69,6 +73,10 @@ public final class CLife extends JavaPlugin {
 
     public ColorManager getColorManager() {
         return colorManager;
+    }
+
+    public TaskScheduler getScheduler() {
+        return scheduler;
     }
 
     public Match getMatch(@NotNull Player player) {

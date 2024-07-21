@@ -1,5 +1,8 @@
 package coma112.clife.utils;
 
+import coma112.clife.enums.Color;
+import coma112.clife.enums.keys.MessageKeys;
+import coma112.clife.managers.Match;
 import coma112.clife.processor.MessageProcessor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
@@ -11,8 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+
+import static coma112.clife.enums.Color.getUpperLimit;
 
 @SuppressWarnings("deprecation")
 public class LifeUtils {
@@ -64,5 +70,19 @@ public class LifeUtils {
         worldBorder.setDamageBuffer(5.0);
         worldBorder.setWarningDistance(10);
         worldBorder.setWarningTime(5);
+    }
+
+    public static void updateMatchColor(@NotNull Match match, @NotNull Player player, @NotNull Player target, @NotNull Color color) {
+        Map<coma112.clife.enums.Color, String> colorMessages = Map.of(
+                coma112.clife.enums.Color.DARK_GREEN, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", coma112.clife.enums.Color.DARK_GREEN.getName()).replace("{target}", target.getName()),
+                coma112.clife.enums.Color.LIME, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", coma112.clife.enums.Color.LIME.getName()).replace("{target}", target.getName()),
+                coma112.clife.enums.Color.YELLOW, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", coma112.clife.enums.Color.YELLOW.getName()).replace("{target}", target.getName()),
+                coma112.clife.enums.Color.ORANGE, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", coma112.clife.enums.Color.ORANGE.getName()).replace("{target}", target.getName()),
+                coma112.clife.enums.Color.RED, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", coma112.clife.enums.Color.RED.getName()).replace("{target}", target.getName()),
+                coma112.clife.enums.Color.VIOLET, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.VIOLET.getName()).replace("{target}", target.getName())
+        );
+
+        match.setTime(target, getUpperLimit(color));
+        player.sendMessage(colorMessages.get(color).replace("{target}", target.getName()));
     }
 }

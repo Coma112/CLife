@@ -104,6 +104,7 @@ rtp-enabled: true # RandomTP when the match starts.
 chest-enabled: true # Starting chests when the match starts
 chest-in-area: 5 # Number of chests spawned in the center and radius.
 loot-in-one-chest: 2 # Number of loot in one chest. I recommend that this number should be lower than the amount of loots below.
+always-day: true # If it's true then it will be always day in the game.
 
 chest-loot:
   1:

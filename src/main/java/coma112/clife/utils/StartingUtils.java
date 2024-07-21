@@ -18,15 +18,4 @@ public class StartingUtils {
         if (!new File(CLife.getInstance().getDataFolder(), resourcePath).exists())
             CLife.getInstance().saveResource(resourcePath, false);
     }
-
-    public static void loadBadBlocks() {
-        for (String key : CLife.getInstance().getConfiguration().getList("bad-blocks")) {
-            try {
-                Material material = Material.valueOf(key.toUpperCase());
-                Match.getBadBlocks().add(material);
-            } catch (IllegalArgumentException exception) {
-                LifeLogger.warn("Invalid material in 'bad-blocks': " + key);
-            }
-        }
-    }
 }

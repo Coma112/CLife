@@ -35,6 +35,8 @@ public class Match {
     @Getter private static HashSet<Material> badBlocks = new HashSet<>();
 
     public Match() {
+        World world = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center")).getWorld();
+
         getAvailablePlayers().addAll(Bukkit.getServer().getOnlinePlayers());
         selectPlayersForMatch();
         startCountdown();
@@ -56,6 +58,12 @@ public class Match {
         startActionBarUpdate();
         CLife.getActiveMatches().add(this);
         getActiveMatchesById().put(getId(), this);
+
+        if (ConfigKeys.ALWAYS_DAY.getBoolean()) {
+            CLife.getInstance().getScheduler().runTaskTimer(() -> {
+                if (world.getTime() > 12000) world.setTime(1000);
+            }, 0, 100);
+        }
     }
 
     public static Match getMatchById(@NotNull String id) {

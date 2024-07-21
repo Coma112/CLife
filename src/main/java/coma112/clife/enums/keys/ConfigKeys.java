@@ -23,6 +23,7 @@ public enum ConfigKeys {
     CHEST_COUNT("chest-in-area"),
     LOOT_IN_ONE_CHEST("loot-in-one-chest"),
     KILLER_DAMAGE("add-time-per-half-heart"),
+    ALWAYS_DAY("always-day"),
     END_TITLE("end.title"),
     END_BROADCAST("end.broadcast"),
     END_SUBTITLE("end.subtitle"),

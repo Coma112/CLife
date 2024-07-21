@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'coma112'
-version = '1.0.4'
+version = '1.0.5'
 
 repositories {
     mavenCentral()
@@ -34,6 +34,7 @@ dependencies {
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.bstats:bstats-bukkit:3.0.2'
+    implementation 'com.github.Anon8281:UniversalScheduler:0.1.6'
 }
 
 java {
@@ -48,6 +49,7 @@ compileJava {
 
 shadowJar {
     relocate 'org.bstats', 'coma112.clife'
+    relocate 'com.github.Anon8281.universalScheduler', 'coma112.clife'
     minimize()
 }
 

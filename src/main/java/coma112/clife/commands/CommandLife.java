@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
@@ -62,7 +63,7 @@ public class CommandLife {
 
     @Subcommand("change")
     @CommandPermission("clife.changetime")
-    public void changeTime(@NotNull Player player, @NotNull Player target, @NotNull String prefix, int time) {
+    public void changeTime(@NotNull Player player, @NotNull @Default("me") Player target, @NotNull String prefix, int time) {
         Match match = CLife.getInstance().getMatch(target);
 
         if (match == null) return;
@@ -106,7 +107,7 @@ public class CommandLife {
             return;
         }
 
-        updateMatchColor(match, player, target, color);
+        LifeUtils.updateMatchColor(match, player, target, color);
     }
 
     @Subcommand("setcenter")
@@ -136,19 +137,5 @@ public class CommandLife {
 
         CLife.getInstance().getConfiguration().set("match-radius", radius);
         player.sendMessage(MessageKeys.SUCCESSFUL_RADIUS.getMessage());
-    }
-
-    private void updateMatchColor(@NotNull Match match, @NotNull Player player, @NotNull Player target, @NotNull Color color) {
-        Map<Color, String> colorMessages = Map.of(
-                Color.DARK_GREEN, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.DARK_GREEN.getName()).replace("{target}", target.getName()),
-                Color.LIME, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.LIME.getName()).replace("{target}", target.getName()),
-                Color.YELLOW, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.YELLOW.getName()).replace("{target}", target.getName()),
-                Color.ORANGE, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.ORANGE.getName()).replace("{target}", target.getName()),
-                Color.RED, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.RED.getName()).replace("{target}", target.getName()),
-                Color.VIOLET, MessageKeys.SUCCESSFUL_SETCOLOR.getMessage().replace("{color}", Color.VIOLET.getName()).replace("{target}", target.getName())
-        );
-
-        match.setTime(target, getUpperLimit(color));
-        player.sendMessage(colorMessages.get(color).replace("{target}", target.getName()));
     }
 }

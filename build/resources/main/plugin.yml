@@ -1,7 +1,8 @@
 name: CLife
-version: '1.0.4'
+version: '1.0.5'
 main: coma112.clife.CLife
 api-version: '1.20'
+folia-supported: true
 
 author: "Coma112 & B3rcyy (Vulcan Studio)"
 
