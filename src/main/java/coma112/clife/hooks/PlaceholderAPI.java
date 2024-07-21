@@ -2,7 +2,7 @@ package coma112.clife.hooks;
 
 import coma112.clife.CLife;
 import coma112.clife.managers.Match;
-import coma112.clife.utils.PlayerUtils;
+import coma112.clife.utils.LifeUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +51,7 @@ public class PlaceholderAPI extends PlaceholderExpansion {
 
             case "time" -> {
                 if (match == null) yield "";
-                else yield PlayerUtils.formatTime(match.getTime(player));
+                else yield LifeUtils.formatTime(match.getTime(player));
             }
 
             case "wins" -> String.valueOf(CLife.getDatabase().getWins(player));

@@ -3,7 +3,7 @@ package coma112.clife.listeners;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
-import coma112.clife.utils.PlayerUtils;
+import coma112.clife.utils.LifeUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,12 +32,12 @@ public class PotionListener implements Listener {
 
             if (data.getType().getEffectType() == PotionEffectType.REGENERATION) {
                 if (match != null) match.addTime(player, regeneration_potion);
-                PlayerUtils.sendTitle(player, "&a+ " + PlayerUtils.formatTime(regeneration_potion), "");
+                LifeUtils.sendTitle(player, "&a+ " + LifeUtils.formatTime(regeneration_potion), "");
             }
 
             if (data.getType().getEffectType() == PotionEffectType.INSTANT_HEALTH) {
                 if (match != null) match.addTime(player, healing_potion);
-                PlayerUtils.sendTitle(player, "&a+ " + PlayerUtils.formatTime(healing_potion), "");
+                LifeUtils.sendTitle(player, "&a+ " + LifeUtils.formatTime(healing_potion), "");
             }
         }
 

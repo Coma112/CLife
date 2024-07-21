@@ -100,3 +100,41 @@ webhook:
     thumbnail: ""
     image: ""
 
+rtp-enabled: true # RandomTP when the match starts.
+chest-enabled: true # Starting chests when the match starts
+chest-in-area: 5 # Number of chests spawned in the center and radius.
+loot-in-one-chest: 2 # Number of loot in one chest. I recommend that this number should be lower than the amount of loots below.
+
+chest-loot:
+  1:
+    amount: 1
+    material: "ENCHANTED_GOLDEN_APPLE"
+    name: "&a&lFREE LIFE!!444!!"
+    lore:
+      - ""
+      - "&2Gives you some minute."
+    chance: "5"
+  2:
+    amount: 1
+    material: "GOLDEN_APPLE"
+    name: "&a&lFREE LIFE (POOR)"
+    lore:
+      - ""
+      - "&2Gives you some minute."
+    chance: "10"
+  3:
+    amount: 2
+    material: "DIAMOND"
+    name: "&bHelp at the start;)"
+    lore:
+      - ""
+      - "&aCraft something :)"
+    chance: "20"
+  4:
+    amount: 1
+    material: "STICK"
+    name: "&fNothing..."
+    lore:
+      - ""
+      - "&fI mean, it's really nothing.."
+    chance: "70"

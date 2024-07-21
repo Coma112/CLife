@@ -8,3 +8,5 @@ messages:
   successful-radius: "&a&lLIFE &8| &aYou have successfully set the radius!"
   successful-center: "&a&lLIFE &8| &aYou have successfully set the center!"
   successful-setcolor: "&a&lLIFE &8| &aYou have successfully set the color of {target} to {color}!"
+  rtp-disabled: "&a&lLIFE &8| &cRandom Teleport is disabled!"
+  no-location-configured: "&a&lLIFE &8| &cNo correct center or radius found!"

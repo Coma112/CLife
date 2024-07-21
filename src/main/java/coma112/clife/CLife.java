@@ -45,6 +45,7 @@ public final class CLife extends JavaPlugin {
         initializeComponents();
         registerListenersAndCommands();
         initializeDatabaseManager();
+        loadBadBlocks();
 
         PlaceholderAPI.registerHook();
 
@@ -53,6 +54,8 @@ public final class CLife extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Match.getChestLocations().clear();
+
         if (database != null) database.disconnect();
     }
 

@@ -3,7 +3,7 @@ package coma112.clife.listeners;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
-import coma112.clife.utils.PlayerUtils;
+import coma112.clife.utils.LifeUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,12 +23,12 @@ public class AppleListener implements Listener {
         switch (item) {
             case GOLDEN_APPLE -> {
                 if (match != null) match.addTime(player, golden_apple);
-                PlayerUtils.sendTitle(player, "&a+ " + PlayerUtils.formatTime(golden_apple), "");
+                LifeUtils.sendTitle(player, "&a+ " + LifeUtils.formatTime(golden_apple), "");
             }
 
             case ENCHANTED_GOLDEN_APPLE -> {
                 if (match != null) match.addTime(player, golden_apple);
-                PlayerUtils.sendTitle(player, "&a+ " + PlayerUtils.formatTime(enchanted_golden_apple), "");
+                LifeUtils.sendTitle(player, "&a+ " + LifeUtils.formatTime(enchanted_golden_apple), "");
             }
         }
     }

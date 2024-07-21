@@ -1,12 +1,13 @@
 package coma112.clife.commands;
 
 import coma112.clife.CLife;
+import coma112.clife.config.Config;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
-import coma112.clife.utils.PlayerUtils;
+import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,7 @@ public class CommandLife {
     @CommandPermission("clife.start")
     public void start(@NotNull Player player) {
         Match match = CLife.getInstance().getMatch(player);
+        Config config = CLife.getInstance().getConfiguration();
 
         if (Bukkit.getOnlinePlayers().size() < ConfigKeys.MINIMUM_PLAYERS.getInt()) {
             player.sendMessage(MessageKeys.NOT_ENOUGH_PLAYERS.getMessage().replace("{minimum}", String.valueOf(ConfigKeys.MINIMUM_PLAYERS.getInt() - Bukkit.getOnlinePlayers().size())));
@@ -32,6 +34,11 @@ public class CommandLife {
 
         if (match != null && match.isInMatch(player)) {
             player.sendMessage(MessageKeys.ALREADY_IN_MATCH.getMessage());
+            return;
+        }
+
+        if (config.getYml().get("match-center") == null || config.getYml().get("match-radius") == null) {
+            player.sendMessage(MessageKeys.INCORRECT_LOCATION.getMessage());
             return;
         }
 
@@ -105,13 +112,23 @@ public class CommandLife {
     @Subcommand("setcenter")
     @CommandPermission("clife.setcenter")
     public void setCenter(@NotNull Player player) {
-        CLife.getInstance().getConfiguration().set("match-center", PlayerUtils.convertLocationToString(player.getLocation()));
+        if (!ConfigKeys.RTP_ENABLED.getBoolean()) {
+            player.sendMessage(MessageKeys.RTP_DISABLED.getMessage());
+            return;
+        }
+
+        CLife.getInstance().getConfiguration().set("match-center", LifeUtils.convertLocationToString(player.getLocation()));
         player.sendMessage(MessageKeys.SUCCESSFUL_CENTER.getMessage());
     }
 
     @Subcommand("setradius")
     @CommandPermission("clife.setradius")
     public void setRadius(@NotNull Player player, double radius) {
+        if (!ConfigKeys.RTP_ENABLED.getBoolean()) {
+            player.sendMessage(MessageKeys.RTP_DISABLED.getMessage());
+            return;
+        }
+
         if (radius <= 0) {
             player.sendMessage(MessageKeys.CANT_BE_NULL.getMessage());
             return;

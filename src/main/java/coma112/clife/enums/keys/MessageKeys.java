@@ -12,7 +12,9 @@ public enum MessageKeys {
     CANT_BE_NULL("messages.cant-be-null"),
     SUCCESSFUL_RADIUS("messages.successful-radius"),
     SUCCESSFUL_CENTER("messages.successful-center"),
+    RTP_DISABLED("messages.rtp-disabled"),
     SUCCESSFUL_SETCOLOR("messages.successful-setcolor"),
+    INCORRECT_LOCATION("messages.no-location-configured"),
     NOT_ENOUGH_PLAYERS("messages.not-enough-players");
 
     private final String path;
