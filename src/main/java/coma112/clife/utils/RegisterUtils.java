@@ -45,5 +45,4 @@ public class RegisterUtils {
         listenerClasses.add(MovementListener.class);
         return listenerClasses;
     }
-
 }

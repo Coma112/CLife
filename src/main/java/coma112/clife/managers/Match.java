@@ -36,10 +36,8 @@ public class Match {
 
     public Match() {
         World world = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center")).getWorld();
-
         getAvailablePlayers().addAll(Bukkit.getServer().getOnlinePlayers());
         selectPlayersForMatch();
-        startCountdown();
 
         getPlayers().forEach(player -> {
             player.getInventory().clear();
@@ -50,12 +48,13 @@ public class Match {
             player.setFlying(false);
             player.setAllowFlight(false);
             player.setGameMode(GameMode.SURVIVAL);
-
             player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
             getPlayerTimes().put(player, ConfigKeys.STARTING_TIME.getInt());
         });
 
+        startCountdown();
         startActionBarUpdate();
+
         CLife.getActiveMatches().add(this);
         getActiveMatchesById().put(getId(), this);
 
@@ -65,6 +64,7 @@ public class Match {
             }, 0, 100);
         }
     }
+
 
     public static Match getMatchById(@NotNull String id) {
         return getActiveMatchesById().get(id);
@@ -80,16 +80,32 @@ public class Match {
     }
 
     public void endMatch() {
-        getPlayers().forEach(player -> CLife.getInstance().getColorManager().removeColor(player));
+        getPlayers().forEach(player -> {
+            CLife.getInstance().getColorManager().removeColor(player);
+            player.getInventory().clear();
+            player.setGameMode(GameMode.SURVIVAL);
+        });
+
         getPlayers().clear();
+
         getSpectators().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
         getSpectators().clear();
+
         winner = null;
+
         CLife.getActiveMatches().remove(this);
         getActiveMatchesById().remove(getId());
+
         getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
         getChestLocations().clear();
+
+        getDefeatedPlayers().clear();
+
+        getStartingPlayers().clear();
+        getDisconnectedSpectators().clear();
+        getPlayerTimes().clear();
     }
+
 
     public boolean isInMatch(@NotNull Player player) {
         return getPlayers().contains(player);

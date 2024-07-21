@@ -6,6 +6,7 @@ damage-per-half-heart: 120 # Time taken by half heart.
 add-time-per-half-heart: 60 # Time given by half heart
 egapple-time: 1800 # Time given by an eaten enchanted golden apple
 gapple-time: 900 # Time given by an eaten NORMAL golden apple
+always-day: true # If it's true then it will be always day in the game.
 
 countdown:
   time: 3 # Time to countdown before starting the match.
@@ -110,7 +111,6 @@ rtp-enabled: true # RandomTP when the match starts.
 chest-enabled: true # Starting chests when the match starts
 chest-in-area: 5 # Number of chests spawned in the center and radius.
 loot-in-one-chest: 2 # Number of loot in one chest. I recommend that this number should be lower than the amount of loots below.
-always-day: true # If it's true then it will be always day in the game.
 
 chest-loot:
   1:
