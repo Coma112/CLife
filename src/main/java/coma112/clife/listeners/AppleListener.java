@@ -27,7 +27,7 @@ public class AppleListener implements Listener {
             }
 
             case ENCHANTED_GOLDEN_APPLE -> {
-                if (match != null) match.addTime(player, golden_apple);
+                if (match != null) match.addTime(player, enchanted_golden_apple);
                 LifeUtils.sendTitle(player, "&a+ " + LifeUtils.formatTime(enchanted_golden_apple), "");
             }
         }

@@ -11,6 +11,7 @@ import coma112.clife.utils.LifeUtils;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -32,7 +33,6 @@ public class Match {
     @Getter public final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     @Getter public final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     @Getter private int countdown;
-    @Getter private static HashSet<Material> badBlocks = new HashSet<>();
 
     public Match() {
         World world = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center")).getWorld();
@@ -65,7 +65,6 @@ public class Match {
         }
     }
 
-
     public static Match getMatchById(@NotNull String id) {
         return getActiveMatchesById().get(id);
     }
@@ -96,16 +95,12 @@ public class Match {
         CLife.getActiveMatches().remove(this);
         getActiveMatchesById().remove(getId());
 
-        getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
-        getChestLocations().clear();
-
         getDefeatedPlayers().clear();
 
         getStartingPlayers().clear();
         getDisconnectedSpectators().clear();
         getPlayerTimes().clear();
     }
-
 
     public boolean isInMatch(@NotNull Player player) {
         return getPlayers().contains(player);
@@ -306,7 +301,6 @@ public class Match {
             chestLocation.setY(center.getWorld().getHighestBlockYAt(chestLocation));
 
             chestLocation.getBlock().setType(Material.CHEST);
-            chestLocations.add(chestLocation);
             fillChestWithLoot(chestLocation);
         }
     }

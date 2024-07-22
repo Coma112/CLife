@@ -1,4 +1,18 @@
 messages:
+  help:
+    - ""
+    - "&8&l━━━━━━━━━━━━━━━━━━━━━━━[━━&a&lCLIFE&8&l━━]━━━━━━━━━━━━━━━━━━━━━━━"
+    - ""
+    - "&a/clife reload &f- &7Újratölti a plugint."
+    - "&a/clife start &f- &7Elindítja a mérkőzést."
+    - "&a/clife stop &f- &7Megállítja a mérkőzést."
+    - "&a/clife changetime &7(&acélpont&7) (&a+ &7vagy &a-&7) &7(&aidő&7) &f- &7Megváltoztatja a célpont idejét."
+    - "&a/clife setcolor &7(&acélpont&7) (&aszín&7) &f- &7Megváltoztatja a célpont színét."
+    - "&a/clife setcenter &f- &7Beállítja az aréna közepét."
+    - "&a/clife setradius &7(&aradius&7) &f- &7Beállítja az aréna sugarát."
+    - ""
+    - "&8&l━━━━━━━━━━━━━━━━━━━━━━━[━━&a&lCLIFE&8&l━━]━━━━━━━━━━━━━━━━━━━━━━━"
+    - ""
   reload: "&a&lLIFE &8| &aSikeresen újratöltöttem a fájlokat!"
   not-enough-players: "&a&lLIFE &8| &cNem indíthatod el a játékot, szükséged van még {minimum} játékosra!"
   already-in-match: "&a&lLIFE &8| &cTe már meccsben van!"

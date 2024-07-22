@@ -4,8 +4,11 @@ import coma112.clife.CLife;
 import coma112.clife.processor.MessageProcessor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public enum MessageKeys {
     RELOAD("messages.reload"),
+    HELP("messages.help"),
     ALREADY_IN_MATCH("messages.already-in-match"),
     NOT_IN_MATCH("messages.not-in-match"),
     TARGET_NOT_IN_MATCH("messages.target-not-in-match"),
@@ -26,4 +29,12 @@ public enum MessageKeys {
     public String getMessage() {
         return MessageProcessor.process(CLife.getInstance().getLanguage().getString(path));
     }
+
+    public List<String> getMessages() {
+        return CLife.getInstance().getLanguage().getList(path)
+                .stream()
+                .map(MessageProcessor::process)
+                .toList();
+    }
+
 }

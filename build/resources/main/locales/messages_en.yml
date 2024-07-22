@@ -1,4 +1,16 @@
 messages:
+  help:
+    - "&8&l━━━━━━━━━━━━━━━━━━━━━━━[━━&a&lCLIFE&8&l━━]━━━━━━━━━━━━━━━━━━━━━━━"
+    - ""
+    - "&a/clife reload &f- &7Reloads the plugin."
+    - "&a/clife start &f- &7Starts the match."
+    - "&a/clife stop &f- &7Stops the match."
+    - "&a/clife changetime &7(&atarget&7) (&a+ &7or &a-&7) &7(&atime&7) &f- &7Changes the time of the target."
+    - "&a/clife setcolor &7(&atarget&7) (&acolor&7) &f- &7Changes the color of the target."
+    - "&a/clife setcenter &f- &7Sets the center of the arena."
+    - "&a/clife setradius &7(&aradius&7) &f- &7Sets the radius of the arena."
+    - ""
+    - "&8&l━━━━━━━━━━━━━━━━━━━━━━━[━━&a&lCLIFE&8&l━━]━━━━━━━━━━━━━━━━━━━━━━━"
   reload: "&a&lLIFE &8| &aI have successfully reloaded the files!"
   not-enough-players: "&a&lLIFE &8| &cYou cannot start the game, you still need {minimum} players!"
   already-in-match: "&a&lLIFE &8| &cYou are already in a match!"

@@ -9,19 +9,38 @@ import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Default;
+import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
-import java.util.Map;
-
-import static coma112.clife.enums.Color.getUpperLimit;
+import java.util.List;
 
 @Command({"clife", "life"})
 public class CommandLife {
+    @DefaultFor({"clife", "life"})
+    public void defaultCommand(@NotNull CommandSender sender) {
+        help(sender);
+    }
+
+    @Subcommand("help")
+    public void help(@NotNull CommandSender sender) {
+        List<String> helpMessages = MessageKeys.HELP.getMessages();
+        helpMessages.forEach(sender::sendMessage);
+    }
+
+    @Subcommand("reload")
+    @CommandPermission("clife.reload")
+    public void reload(@NotNull CommandSender sender) {
+        CLife.getInstance().getLanguage().reload();
+        CLife.getInstance().getConfiguration().reload();
+        sender.sendMessage(MessageKeys.RELOAD.getMessage());
+    }
+
     @Subcommand("start")
     @CommandPermission("clife.start")
     public void start(@NotNull Player player) {
@@ -92,7 +111,7 @@ public class CommandLife {
 
     @Subcommand("setcolor")
     @CommandPermission("clife.setcolor")
-    public void setColor(@NotNull Player player, @NotNull Player target, @NotNull Color color) {
+    public void setColor(@NotNull Player player, @NotNull @Default("me") Player target, @NotNull Color color) {
         Match match = CLife.getInstance().getMatch(target);
 
         if (match == null) return;

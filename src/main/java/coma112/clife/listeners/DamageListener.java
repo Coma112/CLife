@@ -58,6 +58,7 @@ public class DamageListener implements Listener {
             CLife.getDatabase().addDeath(victim);
             CLife.getDatabase().addKill(killer);
             CLife.getInstance().getServer().getPluginManager().callEvent(new MatchKillEvent(victim, killer));
+            victim.spigot().respawn();
         }
     }
 }
