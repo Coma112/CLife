@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import static coma112.clife.utils.LifeUtils.loadBlockedBlocks;
 import static coma112.clife.utils.StartingUtils.*;
 
 public final class CLife extends JavaPlugin {
@@ -51,6 +52,7 @@ public final class CLife extends JavaPlugin {
         initializeComponents();
         registerListenersAndCommands();
         initializeDatabaseManager();
+        loadBlockedBlocks();
 
         PlaceholderAPI.registerHook();
 
@@ -59,9 +61,6 @@ public final class CLife extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Match.getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
-        Match.getChestLocations().clear();
-
         if (database != null) database.disconnect();
     }
 

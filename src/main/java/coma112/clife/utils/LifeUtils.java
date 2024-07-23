@@ -2,21 +2,30 @@ package coma112.clife.utils;
 
 import coma112.clife.CLife;
 import coma112.clife.enums.Color;
-import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
+import coma112.clife.managers.ChestManager;
 import coma112.clife.managers.Match;
 import coma112.clife.processor.MessageProcessor;
-import it.unimi.dsi.fastutil.chars.CharBigList;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
 
 import static coma112.clife.enums.Color.getUpperLimit;
 
@@ -135,18 +144,41 @@ public class LifeUtils {
         Block below = world.getBlockAt(x, y - 1, z);
         Block above = world.getBlockAt(x, y + 1, z);
 
-        if (block.getType() == Material.LAVA || block.getType() == Material.FIRE || block.getType() == Material.WATER) return false;
-        if (below.getType() == Material.LAVA || below.getType() == Material.FIRE || below.getType() == Material.WATER) return false;
+        if (getBlockedBlocks().contains(block.getType())) return false;
+        if (getBlockedBlocks().contains(below.getType())) return false;
 
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
                     Block adjacentBlock = world.getBlockAt(location.clone().add(dx, dy, dz));
-                    if (adjacentBlock.getType() == Material.LAVA || adjacentBlock.getType() == Material.FIRE || adjacentBlock.getType() == Material.WATER) return false;
+                    if (getBlockedBlocks().contains(adjacentBlock.getType())) return false;
                 }
             }
         }
 
         return above.getType() == Material.AIR;
+    }
+
+    public static void loadBlockedBlocks() {
+        List<String> blockedBlocks = CLife.getInstance().getConfiguration().getList("blocked-blocks");
+
+        if (blockedBlocks == null || blockedBlocks.isEmpty()) {
+            LifeLogger.error("No 'blocked-blocks' section found in configuration or it is empty.");
+            return;
+        }
+
+        for (String key : blockedBlocks) {
+            try {
+                Match.getBlockedBlocks().add(Material.valueOf(key.toUpperCase()));
+            } catch (IllegalArgumentException exception) {
+                LifeLogger.error(exception.getMessage());
+            }
+        }
+    }
+
+    public static void fillChestWithLoot(@NotNull Location chestLocation) {
+        Chest chest = (Chest) chestLocation.getBlock().getState();
+        Inventory inventory = chest.getBlockInventory();
+        ChestManager.generateLoot(inventory, "chest-loot");
     }
 }

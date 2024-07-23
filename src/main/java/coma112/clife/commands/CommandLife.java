@@ -18,7 +18,6 @@ import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
-import java.util.List;
 
 @Command({"clife", "life"})
 public class CommandLife {
@@ -29,8 +28,9 @@ public class CommandLife {
 
     @Subcommand("help")
     public void help(@NotNull CommandSender sender) {
-        List<String> helpMessages = MessageKeys.HELP.getMessages();
-        helpMessages.forEach(sender::sendMessage);
+        MessageKeys.HELP
+                .getMessages()
+                .forEach(sender::sendMessage);
     }
 
     @Subcommand("reload")

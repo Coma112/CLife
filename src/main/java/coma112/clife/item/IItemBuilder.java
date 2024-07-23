@@ -6,15 +6,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("deprecation")
 public interface IItemBuilder {
     static IItemBuilder create(@NotNull Material material) {
         return new ItemBuilder(material);

@@ -9,7 +9,7 @@ gapple-time: 900 # Time given by an eaten NORMAL golden apple
 always-day: true # If it's true then it will be always day in the game.
 
 countdown:
-  time: 5 # Time to countdown before starting the match.
+  time: 3 # Time to countdown before starting the match.
   title: "&aThe match is about to start in..."
   subtitle: "&2{time} &aseconds!"
 
@@ -17,6 +17,19 @@ end:
   title: "&c&lGAME OVER"
   subtitle: "&e&lTHE WINNER IS &6{winner}"
   broadcast: "&6{winner} &ahas won the match! &2GG!"
+
+# This section is running when the player's color is changing.
+
+color:
+  broadcast: "&a{player} &fis {color}&f!"
+  player-title: "&fNow you are {color}&f!"
+  player-subtitle: ""
+
+death:
+  victim-title: "&4&lGAME OVER" # Title displayed to the victim when it's died
+  victim-subtitle: "&cYou died" # Subtitle displayed to the victim when it's died
+  broadcast-player: "&a{victim} &7was killed by &a{killer}&7." # Broadcast sent when victim died by another player
+  broadcast-noplayer: "&a{victim} &7died." # Broadcast sent when victim died
 
 potions:
   healing: 1800 # Time given by a used healing potion
@@ -145,3 +158,8 @@ chest-loot:
       - ""
       - "&fI mean, it's really nothing.."
     chance: "70"
+
+blocked-blocks:
+  - "LAVA"
+  - "FIRE"
+  - "WATER"

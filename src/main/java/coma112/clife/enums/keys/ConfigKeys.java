@@ -36,6 +36,15 @@ public enum ConfigKeys {
     REGENERATION_POTION("potions.regeneration"),
     STARTING_TIME("time"),
 
+    COLOR_BROADCAST("color.broadcast"),
+    COLOR_PLAYER_TITLE("color.player-title"),
+    COLOR_PLAYER_SUBTITLE("color.player-subtitle"),
+
+    DEATH_VICTIM_TITLE("death.victim-title"),
+    DEATH_VICTIM_SUBTITLE("death.victim-subtitle"),
+    DEATH_BROADCAST_PLAYER("death.broadcast-player"),
+    DEATH_BROADCAST_NOPLAYER("death.broadcast-noplayer"),
+
 
     WEBHOOK_MATCH_START_EMBED_URL("webhook.match-start-embed.url"),
     WEBHOOK_MATCH_START_EMBED_ENABLED("webhook.match-start-embed.enabled"),

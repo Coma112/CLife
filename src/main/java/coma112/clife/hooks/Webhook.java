@@ -5,18 +5,17 @@ import coma112.clife.events.MatchKillEvent;
 import coma112.clife.events.MatchStartEvent;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

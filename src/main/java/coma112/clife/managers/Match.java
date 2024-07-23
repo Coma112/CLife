@@ -4,6 +4,7 @@ import coma112.clife.CLife;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.events.MatchEndEvent;
+import coma112.clife.events.MatchKillEvent;
 import coma112.clife.events.MatchSpectatorEvent;
 import coma112.clife.events.MatchStartEvent;
 import coma112.clife.utils.LifeLogger;
@@ -13,14 +14,13 @@ import org.bukkit.World;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.Material;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,19 +33,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Match {
-    @Getter public static final Map<String, Match> activeMatchesById = new ConcurrentHashMap<>();
     @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     @Getter private final List<Player> spectators = Collections.synchronizedList(new ArrayList<>());
     @Getter public static final List<Player> startingPlayers = Collections.synchronizedList(new ArrayList<>());
     @Getter public static final List<Location> chestLocations = Collections.synchronizedList(new ArrayList<>());
+    @Getter public final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
+    @Getter public static List<Material> blockedBlocks = Collections.synchronizedList(new ArrayList<>());
+
     @Getter public static final Map<String, String> defeatedPlayers = new ConcurrentHashMap<>();
+    @Getter public static final Map<String, Match> activeMatchesById = new ConcurrentHashMap<>();
+    @Getter public final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
+    @Getter private final Map<Player, Player> lastAttacker = new ConcurrentHashMap<>();
+
+    @Getter private final Set<String> disconnectedSpectators = Collections.synchronizedSet(new HashSet<>());
+
     @Getter private Player winner;
     @Getter public static final String id = "MatchID";
-    @Getter private final Set<String> disconnectedSpectators = Collections.synchronizedSet(new HashSet<>());
-    @Getter public final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
-    @Getter public final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     @Getter private int countdown;
-    private boolean matchEnded = false;
+    @Getter private boolean matchEnded = false;
 
     public Match() {
         World world = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center")).getWorld();
@@ -120,6 +125,7 @@ public class Match {
         getDisconnectedSpectators().clear();
         getPlayerTimes().clear();
         getAvailablePlayers().clear();
+        getLastAttacker().clear();
     }
 
 
@@ -356,7 +362,7 @@ public class Match {
 
                 if (blockAbove.getType() == Material.AIR) {
                     safeLocation.getBlock().setType(Material.CHEST);
-                    fillChestWithLoot(safeLocation);
+                    LifeUtils.fillChestWithLoot(safeLocation);
                     chestLocations.add(safeLocation);
                 } else {
                     LifeLogger.warn("No safe location found for chest placement.");
@@ -367,10 +373,44 @@ public class Match {
         }
     }
 
-    private void fillChestWithLoot(@NotNull Location chestLocation) {
-        Chest chest = (Chest) chestLocation.getBlock().getState();
-        Inventory inventory = chest.getBlockInventory();
-        ChestManager.generateLoot(inventory, "chest-loot");
+    public void recordAttack(@NotNull Player attacker, @NotNull Player victim, double finalDamage) {
+        int victimTime = getTime(victim);
+        int damageTime = (int) finalDamage;
+
+        if (victimTime - damageTime <= 0) handlePlayerDeath(victim, attacker);
+        else {
+            lastAttacker.put(victim, attacker);
+            removeTime(victim, damageTime);
+        }
+    }
+
+    private void handlePlayerDeath(@NotNull Player victim, @Nullable Player killer) {
+        getPlayers().remove(victim);
+        CLife.getInstance().getColorManager().removeColor(victim);
+        getSpectators().add(victim);
+        getDefeatedPlayers().put(victim.getName(), getId());
+        CLife.getInstance().getServer().getPluginManager().callEvent(new MatchSpectatorEvent(Match.this, victim));
+
+        if (killer != null) {
+            getPlayers().forEach(players -> players.sendMessage(ConfigKeys.DEATH_BROADCAST_PLAYER
+                    .getString()
+                    .replace("{victim}", victim.getName())
+                    .replace("{killer}", killer.getName())));
+
+            LifeUtils.sendTitle(victim, ConfigKeys.DEATH_VICTIM_TITLE.getString(), ConfigKeys.DEATH_VICTIM_SUBTITLE.getString());
+            CLife.getDatabase().addDeath(victim);
+            CLife.getDatabase().addKill(killer);
+            CLife.getInstance().getServer().getPluginManager().callEvent(new MatchKillEvent(victim, killer));
+        } else {
+            getPlayers().forEach(players -> players.sendMessage(ConfigKeys.DEATH_BROADCAST_NOPLAYER
+                    .getString()
+                    .replace("{victim}", victim.getName())));
+
+            LifeUtils.sendTitle(victim, ConfigKeys.DEATH_VICTIM_TITLE.getString(), ConfigKeys.DEATH_VICTIM_SUBTITLE.getString());
+        }
+
+        updatePlayerColor();
+        checkForWinner();
     }
 }
 
