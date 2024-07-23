@@ -9,23 +9,35 @@ import coma112.clife.events.MatchStartEvent;
 import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
 import lombok.Getter;
-import org.bukkit.*;
+import org.bukkit.World;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.BlockState;
+import org.bukkit.Material;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Match {
     @Getter public static final Map<String, Match> activeMatchesById = new ConcurrentHashMap<>();
     @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     @Getter private final List<Player> spectators = Collections.synchronizedList(new ArrayList<>());
-    @Getter public static final List<Location> chestLocations = Collections.synchronizedList(new ArrayList<>());
     @Getter public static final List<Player> startingPlayers = Collections.synchronizedList(new ArrayList<>());
+    @Getter public static final List<Location> chestLocations = Collections.synchronizedList(new ArrayList<>());
     @Getter public static final Map<String, String> defeatedPlayers = new ConcurrentHashMap<>();
     @Getter private Player winner;
     @Getter public static final String id = "MatchID";
@@ -33,6 +45,7 @@ public class Match {
     @Getter public final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
     @Getter public final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     @Getter private int countdown;
+    private boolean matchEnded = false;
 
     public Match() {
         World world = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center")).getWorld();
@@ -79,6 +92,12 @@ public class Match {
     }
 
     public void endMatch() {
+        if (matchEnded) return;
+        matchEnded = true;
+
+        getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
+        getChestLocations().clear();
+
         getPlayers().forEach(player -> {
             CLife.getInstance().getColorManager().removeColor(player);
             player.getInventory().clear();
@@ -94,13 +113,15 @@ public class Match {
 
         CLife.getActiveMatches().remove(this);
         getActiveMatchesById().remove(getId());
+        getActiveMatchesById().clear();
 
         getDefeatedPlayers().clear();
 
-        getStartingPlayers().clear();
         getDisconnectedSpectators().clear();
         getPlayerTimes().clear();
+        getAvailablePlayers().clear();
     }
+
 
     public boolean isInMatch(@NotNull Player player) {
         return getPlayers().contains(player);
@@ -129,9 +150,7 @@ public class Match {
     private void selectPlayersForMatch() {
         Collections.shuffle(getAvailablePlayers());
 
-        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), getAvailablePlayers().size()); i++) {
-            getPlayers().add(getAvailablePlayers().get(i));
-        }
+        for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), getAvailablePlayers().size()); i++) getPlayers().add(getAvailablePlayers().get(i));
     }
 
     private void startPlayerCountdown() {
@@ -145,8 +164,9 @@ public class Match {
                         Player player = iterator.next();
                         int remaining = getPlayerTimes().getOrDefault(player, 0);
 
-                        if (remaining > 0) getPlayerTimes().put(player, remaining - 1);
-                        else {
+                        if (remaining > 0) {
+                            getPlayerTimes().put(player, remaining - 1);
+                        } else {
                             iterator.remove();
                             CLife.getInstance().getColorManager().removeColor(player);
                             getSpectators().add(player);
@@ -161,6 +181,7 @@ public class Match {
             }
         }.runTaskTimer(CLife.getInstance(), 0L, 20L);
     }
+
 
     private void startCountdown() {
         countdown = ConfigKeys.COUNTDOWN.getInt();
@@ -255,6 +276,7 @@ public class Match {
         }
     }
 
+
     private void randomTeleport() {
         Location center = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("match-center"));
         double radius = CLife.getInstance().getConfiguration().getYml().getDouble("match-radius");
@@ -265,18 +287,35 @@ public class Match {
         }
 
         getPlayers().forEach(player -> {
-            Location teleportLocation;
+            Location teleportLocation = LifeUtils.findSafeLocation(center, radius);
+            if (teleportLocation != null) {
+                World world = teleportLocation.getWorld();
+                int x = teleportLocation.getBlockX();
+                int z = teleportLocation.getBlockZ();
 
-            double angle = Math.random() * Math.PI * 2;
-            double distance = Math.random() * radius;
-            double xOffset = Math.cos(angle) * distance;
-            double zOffset = Math.sin(angle) * distance;
+                int y = world.getHighestBlockYAt(x, z);
+                Location safeLocation = new Location(world, x, y + 1, z);
 
-            teleportLocation = center.clone().add(xOffset, 0, zOffset);
-            center.getWorld().loadChunk(teleportLocation.getChunk());
-            teleportLocation.setY(center.getWorld().getHighestBlockYAt(teleportLocation));
+                Block blockAbove = world.getBlockAt(safeLocation);
+                if (blockAbove.getType() == Material.AIR) {
+                    player.teleport(safeLocation);
+                } else {
+                    int retries = 5;
+                    while (retries > 0 && blockAbove.getType() != Material.AIR) {
+                        safeLocation.setY(safeLocation.getY() + 1);
+                        blockAbove = world.getBlockAt(safeLocation);
+                        retries--;
+                    }
 
-            player.teleport(teleportLocation);
+                    if (blockAbove.getType() == Material.AIR) {
+                        player.teleport(safeLocation);
+                    } else {
+                        LifeLogger.warn("No safe location found for player " + player.getName());
+                    }
+                }
+            } else {
+                LifeLogger.warn("No safe location found for player " + player.getName());
+            }
         });
     }
 
@@ -289,19 +328,42 @@ public class Match {
             return;
         }
 
+        for (Location location : getChestLocations()) {
+            if (location.getBlock().getType() == Material.CHEST) {
+                location.getBlock().setType(Material.AIR);
+            }
+        }
+        chestLocations.clear();
+
         for (int i = 0; i < ConfigKeys.CHEST_COUNT.getInt(); i++) {
-            Location chestLocation;
+            Location chestLocation = LifeUtils.findSafeLocation(center, radius);
 
-            double angle = Math.random() * Math.PI * 2;
-            double distance = Math.random() * radius;
-            double xOffset = Math.cos(angle) * distance;
-            double zOffset = Math.sin(angle) * distance;
+            if (chestLocation != null) {
+                World world = chestLocation.getWorld();
+                int x = chestLocation.getBlockX();
+                int z = chestLocation.getBlockZ();
+                int y = world.getHighestBlockYAt(x, z);
 
-            chestLocation = center.clone().add(xOffset, 0, zOffset);
-            chestLocation.setY(center.getWorld().getHighestBlockYAt(chestLocation));
+                Location safeLocation = new Location(world, x, y + 1, z);
+                Block blockAbove = world.getBlockAt(safeLocation);
+                int retries = 5;
 
-            chestLocation.getBlock().setType(Material.CHEST);
-            fillChestWithLoot(chestLocation);
+                while (retries > 0 && blockAbove.getType() != Material.AIR) {
+                    safeLocation.setY(safeLocation.getY() + 1);
+                    blockAbove = world.getBlockAt(safeLocation);
+                    retries--;
+                }
+
+                if (blockAbove.getType() == Material.AIR) {
+                    safeLocation.getBlock().setType(Material.CHEST);
+                    fillChestWithLoot(safeLocation);
+                    chestLocations.add(safeLocation);
+                } else {
+                    LifeLogger.warn("No safe location found for chest placement.");
+                }
+            } else {
+                LifeLogger.warn("No safe location found for chest placement.");
+            }
         }
     }
 
@@ -311,3 +373,4 @@ public class Match {
         ChestManager.generateLoot(inventory, "chest-loot");
     }
 }
+

@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
+    compileOnly "io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT"
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
     implementation 'com.github.Revxrsal.Lamp:common:3.2.1'
     compileOnly 'me.clip:placeholderapi:2.11.3'

@@ -16,10 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 import static coma112.clife.enums.Color.getUpperLimit;
 
@@ -87,5 +84,69 @@ public class LifeUtils {
 
         match.setTime(target, getUpperLimit(color));
         player.sendMessage(colorMessages.get(color).replace("{target}", target.getName()));
+    }
+
+    public static Location findSafeLocation(@NotNull Location center, double radius) {
+        Random random = new Random();
+        int maxAttempts = 5;
+        int maxRetries = 50;
+        Set<Location> triedLocations = new HashSet<>();
+        Location safeLocation = null;
+
+        for (int retry = 0; retry < maxRetries; retry++) {
+            int attempt = 0;
+            boolean foundSafeLocation = false;
+
+            while (attempt < maxAttempts) {
+                double angle = random.nextDouble() * 2 * Math.PI;
+                double distance = random.nextDouble() * radius;
+                double xOffset = Math.cos(angle) * distance;
+                double zOffset = Math.sin(angle) * distance;
+                int x = (int) Math.floor(center.getX() + xOffset);
+                int z = (int) Math.floor(center.getZ() + zOffset);
+                Location potentialLocation = new Location(center.getWorld(), x, center.getWorld().getHighestBlockYAt(x, z), z);
+
+                if (!triedLocations.contains(potentialLocation) && isSafeLocation(potentialLocation)) {
+                    safeLocation = potentialLocation;
+                    foundSafeLocation = true;
+                    break;
+                }
+
+                triedLocations.add(potentialLocation);
+                attempt++;
+            }
+
+            if (foundSafeLocation) return safeLocation;
+        }
+
+        return safeLocation;
+    }
+
+    public static boolean isSafeLocation(@NotNull Location location) {
+        World world = location.getWorld();
+        if (world == null) return false;
+
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+        int y = world.getHighestBlockYAt(x, z);
+
+
+        Block block = world.getBlockAt(x, y, z);
+        Block below = world.getBlockAt(x, y - 1, z);
+        Block above = world.getBlockAt(x, y + 1, z);
+
+        if (block.getType() == Material.LAVA || block.getType() == Material.FIRE || block.getType() == Material.WATER) return false;
+        if (below.getType() == Material.LAVA || below.getType() == Material.FIRE || below.getType() == Material.WATER) return false;
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    Block adjacentBlock = world.getBlockAt(location.clone().add(dx, dy, dz));
+                    if (adjacentBlock.getType() == Material.LAVA || adjacentBlock.getType() == Material.FIRE || adjacentBlock.getType() == Material.WATER) return false;
+                }
+            }
+        }
+
+        return above.getType() == Material.AIR;
     }
 }

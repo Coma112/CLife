@@ -16,6 +16,7 @@ import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +59,7 @@ public final class CLife extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Match.getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
         Match.getChestLocations().clear();
 
         if (database != null) database.disconnect();

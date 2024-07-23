@@ -11,3 +11,4 @@ public class MovementListener implements Listener {
         if (Match.getStartingPlayers().contains(event.getPlayer())) event.setCancelled(true);
     }
 }
+
