@@ -45,6 +45,10 @@ public enum ConfigKeys {
     DEATH_BROADCAST_PLAYER("death.broadcast-player"),
     DEATH_BROADCAST_NOPLAYER("death.broadcast-noplayer"),
 
+    RADIUS("world-radius"),
+
+    QUEUE_MAX("queue.maxplayer"),
+
 
     WEBHOOK_MATCH_START_EMBED_URL("webhook.match-start-embed.url"),
     WEBHOOK_MATCH_START_EMBED_ENABLED("webhook.match-start-embed.enabled"),

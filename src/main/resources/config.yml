@@ -18,6 +18,11 @@ end:
   subtitle: "&e&lTHE WINNER IS &6{winner}"
   broadcast: "&6{winner} &ahas won the match! &2GG!"
 
+world-radius: 15
+
+queue:
+  maxplayer: 2
+
 # This section is running when the player's color is changing.
 
 color:

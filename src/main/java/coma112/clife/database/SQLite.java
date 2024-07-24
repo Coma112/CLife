@@ -3,11 +3,14 @@ package coma112.clife.database;
 import coma112.clife.CLife;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class SQLite extends AbstractDatabase {
@@ -37,10 +40,27 @@ public class SQLite extends AbstractDatabase {
     }
 
     @Override
+    public void reconnect() {
+        try {
+            if (getConnection() != null && !getConnection().isClosed()) getConnection().close();
+            new SQLite();
+        } catch (SQLException | ClassNotFoundException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+    }
+
+    @Override
     public void createTable() {
         String query = "CREATE TABLE IF NOT EXISTS life (ID INT AUTO_INCREMENT PRIMARY KEY, PLAYER VARCHAR(255) NOT NULL, WINS DEFAULT 0, KILLS DEFAULT 0, DEATHS DEFAULT 0)";
+        String worldsQuery = "CREATE TABLE IF NOT EXISTS worlds (WORLD_ID VARCHAR(255) PRIMARY KEY)";
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.execute();
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(worldsQuery)) {
             preparedStatement.execute();
         } catch (SQLException exception) {
             LifeLogger.error(exception.getMessage());
@@ -203,12 +223,69 @@ public class SQLite extends AbstractDatabase {
     }
 
     @Override
-    public void reconnect() {
-        try {
-            if (getConnection() != null && !getConnection().isClosed()) getConnection().close();
-            new SQLite();
-        } catch (SQLException | ClassNotFoundException exception) {
+    public String getID(@NotNull World world) {
+        String query = "SELECT WORLD_ID FROM worlds WHERE WORLD_ID = ?";
+        String worldName = world.getName();
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("WORLD_ID");
+                }
+            }
+        } catch (SQLException exception) {
             LifeLogger.error(exception.getMessage());
         }
+
+        return null;
+    }
+
+
+    @Override
+    public void saveWorldID(@NotNull String worldID) {
+        String query = "INSERT INTO worlds (WORLD_ID) VALUES (?)";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldID);
+            preparedStatement.executeUpdate();
+            LifeLogger.info("World ID " + worldID + " saved to database.");
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isIDExists(@NotNull String worldID) {
+        String query = "SELECT 1 FROM worlds WHERE WORLD_ID = ?";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldID);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public List<String> getWorlds() {
+        List<String> worlds = new ArrayList<>();
+        String query = "SELECT WORLD_ID FROM worlds";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                worlds.add(resultSet.getString("WORLD_ID"));
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return worlds;
     }
 }

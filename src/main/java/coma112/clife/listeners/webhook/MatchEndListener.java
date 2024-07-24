@@ -13,19 +13,21 @@ import static coma112.clife.hooks.Webhook.replacePlaceholdersMatchEnd;
 public class MatchEndListener implements Listener {
     @EventHandler
     public void onStart(final MatchEndEvent event) throws IOException, NoSuchFieldException, IllegalAccessException {
-        Webhook.sendWebhook(
-                ConfigKeys.WEBHOOK_MATCH_END_EMBED_URL.getString(),
-                ConfigKeys.WEBHOOK_MATCH_END_EMBED_ENABLED.getBoolean(),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_DESCRIPTION.getString(), event),
-                ConfigKeys.WEBHOOK_MATCH_END_EMBED_COLOR.getString(),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_AUTHOR_NAME.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_AUTHOR_URL.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_AUTHOR_ICON.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_FOOTER_TEXT.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_FOOTER_ICON.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_THUMBNAIL.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_TITLE.getString(), event),
-                replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_IMAGE.getString(), event)
-        );
+        if (event.getMatch().getWinner() != null) {
+            Webhook.sendWebhook(
+                    ConfigKeys.WEBHOOK_MATCH_END_EMBED_URL.getString(),
+                    ConfigKeys.WEBHOOK_MATCH_END_EMBED_ENABLED.getBoolean(),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_DESCRIPTION.getString(), event),
+                    ConfigKeys.WEBHOOK_MATCH_END_EMBED_COLOR.getString(),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_AUTHOR_NAME.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_AUTHOR_URL.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_AUTHOR_ICON.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_FOOTER_TEXT.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_FOOTER_ICON.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_THUMBNAIL.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_TITLE.getString(), event),
+                    replacePlaceholdersMatchEnd(ConfigKeys.WEBHOOK_MATCH_END_EMBED_IMAGE.getString(), event)
+            );
+        }
     }
 }

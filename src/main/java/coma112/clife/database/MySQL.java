@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import coma112.clife.CLife;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -245,5 +248,71 @@ public class MySQL extends AbstractDatabase {
         } catch (SQLException exception) {
             LifeLogger.error(exception.getMessage());
         }
+    }
+
+    @Override
+    public void saveWorldID(@NotNull String worldID) {
+        String query = "INSERT INTO worlds (world_id) VALUES (?)";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldID);
+            preparedStatement.executeUpdate();
+            LifeLogger.info("World ID " + worldID + " saved to database.");
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isIDExists(@NotNull String worldID) {
+        String query = "SELECT 1 FROM worlds WHERE world_id = ?";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldID);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public String getID(@NotNull World world) {
+        String query = "SELECT WORLD_ID FROM worlds WHERE WORLD_ID = ?";
+        String worldName = world.getName();
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("WORLD_ID");
+                }
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<String> getWorlds() {
+        List<String> worlds = new ArrayList<>();
+        String query = "SELECT WORLD_ID FROM worlds";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                worlds.add(resultSet.getString("WORLD_ID"));
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return worlds;
     }
 }

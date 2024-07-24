@@ -40,7 +40,6 @@ public class RegisterUtils {
         listenerClasses.add(MatchEndListener.class);
         listenerClasses.add(MatchKillListener.class);
         listenerClasses.add(DatabaseListener.class);
-        listenerClasses.add(DisconnectListener.class);
         listenerClasses.add(SpectatorListener.class);
         listenerClasses.add(MovementListener.class);
         return listenerClasses;

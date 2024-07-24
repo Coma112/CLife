@@ -6,10 +6,16 @@ import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
+import coma112.clife.queue.Queue;
 import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.annotation.Command;
@@ -46,6 +52,11 @@ public class CommandLife {
     public void start(@NotNull Player player) {
         Match match = CLife.getInstance().getMatch(player);
         Config config = CLife.getInstance().getConfiguration();
+
+        if (config.getYml().get("lobby") == null) {
+            player.sendMessage(MessageKeys.NO_LOBBY.getMessage());
+            return;
+        }
 
         if (Bukkit.getOnlinePlayers().size() < ConfigKeys.MINIMUM_PLAYERS.getInt()) {
             player.sendMessage(MessageKeys.NOT_ENOUGH_PLAYERS.getMessage().replace("{minimum}", String.valueOf(ConfigKeys.MINIMUM_PLAYERS.getInt() - Bukkit.getOnlinePlayers().size())));
@@ -156,5 +167,58 @@ public class CommandLife {
 
         CLife.getInstance().getConfiguration().set("match-radius", radius);
         player.sendMessage(MessageKeys.SUCCESSFUL_RADIUS.getMessage());
+    }
+
+    @Subcommand("setlobby")
+    @CommandPermission("clife.setlobby")
+    public void setLobby(@NotNull Player player) {
+        CLife.getInstance().getConfiguration().set("lobby", LifeUtils.convertLocationToString(player.getLocation()));
+
+        World world = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")).getWorld();
+
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setGameRule(GameRule.DO_FIRE_TICK, false);
+        world.setGameRule(GameRule.DO_LIMITED_CRAFTING, false);
+        world.setGameRule(GameRule.DO_ENTITY_DROPS, false);
+        world.setGameRule(GameRule.DO_TILE_DROPS, false);
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setGameRule(GameRule.DO_MOB_LOOT, false);
+        world.setGameRule(GameRule.DO_ENTITY_DROPS, false);
+        world.setGameRule(GameRule.MOB_GRIEFING, false);
+        world.setGameRule(GameRule.DO_ENTITY_DROPS, false);
+        world.setGameRule(GameRule.DO_TILE_DROPS, false);
+        world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
+        world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, false);
+        world.setGameRule(GameRule.DO_INSOMNIA, false);
+        world.setTime(6000);
+        world.setStorm(false);
+        world.setThundering(false);
+        world.setPVP(false);
+        world.setDifficulty(Difficulty.PEACEFUL);
+
+        world.getEntities()
+                .stream()
+                .filter(entity -> entity.getType() != EntityType.PLAYER)
+                .filter(entity -> entity.getType() != EntityType.PAINTING)
+                .filter(entity -> entity.getType() != EntityType.ITEM_FRAME)
+                .filter(entity -> entity.getType() != EntityType.ARMOR_STAND)
+                .forEach(Entity::remove);
+
+        player.sendMessage(MessageKeys.SUCCESSFUL_SETLOBBY.getMessage());
+    }
+
+    @Subcommand("joinqueue")
+    @CommandPermission("clife.joinqueue")
+    public void joinQueue(@NotNull Player player) {
+        Queue.addPlayerToQueue(player);
+
+    }
+
+    @Subcommand("quitqueue")
+    @CommandPermission("clife.quitqueue")
+    public void quitQueue(@NotNull Player player) {
+        Queue.removePlayerFromQueue(player);
     }
 }

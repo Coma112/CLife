@@ -15,7 +15,7 @@ public class AppleListener implements Listener {
     public void onConsume(final PlayerItemConsumeEvent event) {
         Material item = event.getItem().getType();
         Player player = event.getPlayer();
-        Match match = CLife.getInstance().getMatch(player);
+        Match match = Match.getMatchById(player.getLocation().getWorld().getName());
 
         int golden_apple = ConfigKeys.GOLDEN_APPLE_TIME.getInt();
         int enchanted_golden_apple = ConfigKeys.ENCHANTED_GOLDEN_APPLE_TIME.getInt();

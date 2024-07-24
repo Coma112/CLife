@@ -18,6 +18,13 @@ public enum MessageKeys {
     RTP_DISABLED("messages.rtp-disabled"),
     SUCCESSFUL_SETCOLOR("messages.successful-setcolor"),
     INCORRECT_LOCATION("messages.no-location-configured"),
+    SUCCESSFUL_SETLOBBY("messages.successful-setlobby"),
+    NO_LOBBY("messages.no-lobby"),
+    IN_QUEUE("messages.in-queue"),
+    QUEUE_UPDATE_LEFT("messages.queue-update-left"),
+    QUEUE_UPDATE_JOIN("messages.queue-update-join"),
+    REMOVE_FROM_QUEUE("messages.removed-from-queue"),
+    NOT_IN_QUEUE("messages.not-in-queue"),
     NOT_ENOUGH_PLAYERS("messages.not-enough-players");
 
     private final String path;

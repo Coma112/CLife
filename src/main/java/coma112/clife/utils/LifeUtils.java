@@ -9,23 +9,22 @@ import coma112.clife.processor.MessageProcessor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.List;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldBorder;
 
 import static coma112.clife.enums.Color.getUpperLimit;
 
@@ -36,6 +35,8 @@ public class LifeUtils {
     @Getter public static HashSet<Material> blockedBlocks = new HashSet<>();
     @Getter private static double originalBorderSize;
     @Getter private static Location originalBorderCenter;
+    @Getter private static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    @Getter private static final SecureRandom random = new SecureRandom();
 
     public static void sendActionBar(@NotNull Player player, @NotNull String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(MessageProcessor.process(message)));
@@ -180,5 +181,49 @@ public class LifeUtils {
         Chest chest = (Chest) chestLocation.getBlock().getState();
         Inventory inventory = chest.getBlockInventory();
         ChestManager.generateLoot(inventory, "chest-loot");
+    }
+
+    public static String generateUniqueID() {
+        String uniqueID;
+
+        do {
+            uniqueID = generateRandomID();
+        } while (CLife.getDatabase().isIDExists(uniqueID));
+        return uniqueID;
+    }
+
+    public static World createWorld(@NotNull String worldName) {
+        return Bukkit.createWorld(new WorldCreator(worldName));
+    }
+
+    public static void deleteWorld(@NotNull World world) {
+        if (world == null) return;
+
+        Bukkit.getScheduler().runTask(CLife.getInstance(), () -> {
+            Bukkit.unloadWorld(world, false);
+            File worldFolder = world.getWorldFolder();
+            deleteRecursively(worldFolder);
+        });
+    }
+
+    private static void deleteRecursively(@NotNull File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+
+            if (files != null) {
+                for (File f : files) deleteRecursively(f);
+            }
+        }
+        file.delete();
+    }
+
+    private static String generateRandomID() {
+        StringBuilder id = new StringBuilder();
+
+        for (int i = 0; i < 10; i++) {
+            int index = getRandom().nextInt(getAlphabet().length());
+            id.append(getAlphabet().charAt(index));
+        }
+        return id.toString();
     }
 }

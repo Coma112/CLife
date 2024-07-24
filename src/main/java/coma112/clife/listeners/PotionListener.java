@@ -19,7 +19,7 @@ public class PotionListener implements Listener {
     public void onConsume(final PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        Match match = CLife.getInstance().getMatch(player);
+        Match match = Match.getMatchById(player.getLocation().getWorld().getName());
 
         int healing_potion = ConfigKeys.HEALING_POTION.getInt();
         int regeneration_potion = ConfigKeys.REGENERATION_POTION.getInt();
