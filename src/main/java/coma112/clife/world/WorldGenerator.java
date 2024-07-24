@@ -13,29 +13,20 @@ public class WorldGenerator {
     private static World generatedWorld;
 
     public static World generateWorld() {
-        if (generated) {
-            return generatedWorld;
-        }
+        if (generated) return generatedWorld;
 
         String uniqueID = LifeUtils.generateUniqueID();
-        CLife.getDatabase().saveWorldID(uniqueID);
-
         WorldCreator creator = new WorldCreator(uniqueID);
         generatedWorld = Bukkit.createWorld(creator);
 
-        if (generatedWorld != null) {
-            generated = true;
-        }
+        CLife.getDatabase().saveWorldID(uniqueID);
 
+        if (generatedWorld != null) generated = true;
         return generatedWorld;
     }
 
-    public static boolean isWorldGenerated() {
-        return generated;
-    }
-
-    public static void setfalse() {
+    public static void setFalse() {
         generated = false;
-        generatedWorld = null; // Also reset the world reference
+        generatedWorld = null;
     }
 }

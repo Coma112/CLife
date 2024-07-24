@@ -106,7 +106,7 @@ public class DamageListener implements Listener {
 
         if (match != null) {
             player.spigot().respawn();
-            player.teleport(match.getWorld().getSpawnLocation());
+            player.teleport(player.getWorld().getSpawnLocation());
         }
     }
 

@@ -19,8 +19,6 @@ messages:
   not-in-match: "&a&lLIFE &8| &cNem vagy még meccsben!"
   target-not-in-match: "&a&lLIFE &8| &cA kijelölt nincsen még meccsben!"
   cant-be-null: "&a&lLIFE &8| &cA szám nem lehet 0 vagy kisebb!"
-  successful-radius: "&a&lLIFE &8| &aSikeresen beállítottad a sugarat!"
-  successful-center: "&a&lLIFE &8| &aSikeresen beállítottad a középpontot!"
   successful-setcolor: "&a&lLIFE &8| &aSikeresen beállítottad {target} színét {color}-ra!"
   rtp-disabled: "&a&lLIFE &8| &cA véletlenszerű teleportálás le van tiltva!"
   no-location-configured: "&a&lLIFE &8| &cNem található helyes középpont vagy sugár!"

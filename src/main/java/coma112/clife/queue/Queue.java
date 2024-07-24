@@ -6,10 +6,12 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeUtils;
+import coma112.clife.world.WorldGenerator;
 import lombok.Getter;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +57,7 @@ public class Queue {
     public static void processQueue() {
         CLife.getInstance().getScheduler().runTaskLater(() -> {
             List<Player> playersToProcess;
-
+            World world = WorldGenerator.generateWorld();
             synchronized (getQueue()) {
                 if (getQueue().size() < ConfigKeys.QUEUE_MAX.getInt()) return;
                 playersToProcess = new ArrayList<>(getQueue().subList(0, ConfigKeys.QUEUE_MAX.getInt()));
@@ -68,7 +70,7 @@ public class Queue {
                 getQueue().remove(player);
             });
 
-            new Match();
+            new Match(world);
         }, 100L);
     }
 

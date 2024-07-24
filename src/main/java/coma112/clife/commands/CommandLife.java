@@ -7,7 +7,6 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.queue.Queue;
-import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
@@ -23,6 +22,8 @@ import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
+
+import java.util.ArrayList;
 
 
 @Command({"clife", "life"})
@@ -47,35 +48,6 @@ public class CommandLife {
         sender.sendMessage(MessageKeys.RELOAD.getMessage());
     }
 
-    @Subcommand("start")
-    @CommandPermission("clife.start")
-    public void start(@NotNull Player player) {
-        Match match = CLife.getInstance().getMatch(player);
-        Config config = CLife.getInstance().getConfiguration();
-
-        if (config.getYml().get("lobby") == null) {
-            player.sendMessage(MessageKeys.NO_LOBBY.getMessage());
-            return;
-        }
-
-        if (Bukkit.getOnlinePlayers().size() < ConfigKeys.MINIMUM_PLAYERS.getInt()) {
-            player.sendMessage(MessageKeys.NOT_ENOUGH_PLAYERS.getMessage().replace("{minimum}", String.valueOf(ConfigKeys.MINIMUM_PLAYERS.getInt() - Bukkit.getOnlinePlayers().size())));
-            return;
-        }
-
-        if (match != null && match.isInMatch(player)) {
-            player.sendMessage(MessageKeys.ALREADY_IN_MATCH.getMessage());
-            return;
-        }
-
-        if (config.getYml().get("match-center") == null || config.getYml().get("match-radius") == null) {
-            player.sendMessage(MessageKeys.INCORRECT_LOCATION.getMessage());
-            return;
-        }
-
-        new Match();
-    }
-
     @Subcommand("stop")
     @CommandPermission("clife.stop")
     public void stop(@NotNull Player player, @NotNull @Default("none") String id) {
@@ -96,7 +68,7 @@ public class CommandLife {
     @Subcommand("stopall")
     @CommandPermission("clife.stopall")
     public void stopAll(@NotNull Player player) {
-        CLife.getActiveMatches().forEach(Match::endMatch);
+        new ArrayList<>(CLife.getActiveMatches()).forEach(Match::endMatch);
         player.sendMessage(MessageKeys.SUCCESSFUL_STOPALL.getMessage());
     }
 

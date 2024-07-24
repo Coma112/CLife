@@ -192,13 +192,20 @@ public class LifeUtils {
         return uniqueID;
     }
 
-    public static void deleteWorld(@NotNull World world) {
-        Bukkit.getScheduler().runTask(CLife.getInstance(), () -> {
+    public static void deleteWorld(World world) {
+        if (world == null) {
+            LifeLogger.warn("Cannot delete world because the world is null.");
+            return;
+        }
+
+        CLife.getInstance().getScheduler().runTask(() -> {
             Bukkit.unloadWorld(world, false);
             File worldFolder = world.getWorldFolder();
+            CLife.getDatabase().removeWorldID(world.getName());
             deleteRecursively(worldFolder);
         });
     }
+
 
     private static void deleteRecursively(@NotNull File file) {
         if (file.isDirectory()) {

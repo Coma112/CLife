@@ -35,6 +35,8 @@ public abstract class AbstractDatabase {
 
     public abstract void saveWorldID(@NotNull String worldID);
 
+    public abstract void removeWorldID(@NotNull String worldID);
+
     public abstract boolean isIDExists(@NotNull String worldID);
 
     public abstract List<String> getWorlds();

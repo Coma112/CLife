@@ -17,7 +17,6 @@ public enum MessageKeys {
     SUCCESSFUL_CENTER("messages.successful-center"),
     RTP_DISABLED("messages.rtp-disabled"),
     SUCCESSFUL_SETCOLOR("messages.successful-setcolor"),
-    INCORRECT_LOCATION("messages.no-location-configured"),
     SUCCESSFUL_SETLOBBY("messages.successful-setlobby"),
     NO_MATCH_FOUND("messages.no-match-found"),
     NO_LOBBY("messages.no-lobby"),

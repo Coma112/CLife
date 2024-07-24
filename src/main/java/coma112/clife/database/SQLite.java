@@ -250,7 +250,6 @@ public class SQLite extends AbstractDatabase {
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
             preparedStatement.setString(1, worldID);
             preparedStatement.executeUpdate();
-            LifeLogger.info("World ID " + worldID + " saved to database.");
         } catch (SQLException exception) {
             LifeLogger.error(exception.getMessage());
         }
@@ -269,6 +268,18 @@ public class SQLite extends AbstractDatabase {
             LifeLogger.error(exception.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public void removeWorldID(@NotNull String worldID) {
+        String query = "DELETE FROM worlds WHERE WORLD_ID = ?";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, worldID);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package coma112.clife.managers;
 
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import coma112.clife.CLife;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.GameState;
@@ -16,7 +17,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -43,21 +43,19 @@ public class Match {
     @Getter private static final Map<String, Match> activeMatchesById = new ConcurrentHashMap<>();
     @Getter private final Map<Player, Integer> playerTimes = new ConcurrentHashMap<>();
     @Getter private final Map<Player, Player> lastAttacker = new ConcurrentHashMap<>();
+    private static MyScheduledTask countdownTask;
 
     @Getter private Player winner;
     @Getter private String id;
     @Getter private int countdown;
     @Getter private boolean matchEnded = false;
     @Getter private GameState gameState;
-    @Getter private World world;
+    @Getter private Team team;
 
-    private Team team;
-
-    public Match() {
+    public Match(@NotNull World world) {
         setStatus(GameState.WAITING);
 
         CLife.getInstance().getScheduler().runTask(() -> {
-            world = WorldGenerator.generateWorld();
 
             if (world == null) {
                 LifeLogger.warn("World generation failed. Match cannot be started.");
@@ -66,7 +64,7 @@ public class Match {
 
             id = world.getName();
             getActiveMatchesById().put(getId(), Match.this);
-            WorldGenerator.setfalse();
+            WorldGenerator.setFalse();
             setupMatchWorld(world);
             selectPlayersForMatch();
 
@@ -84,42 +82,46 @@ public class Match {
         return getActiveMatchesById().get(id);
     }
 
-
     public void endMatch() {
+        World world = Bukkit.getWorld(id);
         setStatus(GameState.RESTARTING);
         if (matchEnded) return;
         matchEnded = true;
+        getTeam().unregister();
 
         synchronized (getChestLocations()) {
-            getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
-            getChestLocations().clear();
+            getChestLocations().stream()
+                    .filter(location -> location.getWorld().equals(Bukkit.getWorld(id)))
+                    .forEach(location -> {
+                        Block block = location.getBlock();
+                        if (block.getType() != Material.AIR) block.setType(Material.AIR);
+                    });
+            getChestLocations().removeIf(location -> location.getWorld().equals(Bukkit.getWorld(id)));
         }
 
         synchronized (getPlayers()) {
             Iterator<Player> playerIterator = getPlayers().iterator();
+
             while (playerIterator.hasNext()) {
                 Player player = playerIterator.next();
                 player.getInventory().clear();
                 player.setGameMode(GameMode.SURVIVAL);
-                System.out.println("Teleporting" + player.getName() + "to" + LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")) );
                 player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 CLife.getInstance().getColorManager().removeColor(player);
                 playerIterator.remove();
-                team.removeEntry(player.getName());
             }
         }
 
         synchronized (getSpectators()) {
             Iterator<Player> spectatorIterator = getSpectators().iterator();
-            while (spectatorIterator.hasNext()) {
 
+            while (spectatorIterator.hasNext()) {
                 Player player = spectatorIterator.next();
                 player.getInventory().clear();
                 player.setGameMode(GameMode.SURVIVAL);
                 player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 CLife.getInstance().getColorManager().removeColor(player);
                 spectatorIterator.remove();
-                team.removeEntry(player.getName());
             }
         }
 
@@ -127,7 +129,7 @@ public class Match {
             getDefeatedPlayers().entrySet().removeIf(entry -> entry.getValue().equals(getId()));
         }
 
-        LifeUtils.deleteWorld(getWorld());
+        LifeUtils.deleteWorld(world);
         CLife.getActiveMatches().remove(this);
         getActiveMatchesById().remove(getId());
 
@@ -171,6 +173,17 @@ public class Match {
         this.gameState = gameState;
     }
 
+    public void recordAttack(@NotNull Player attacker, @NotNull Player victim, double finalDamage) {
+        int victimTime = getTime(victim);
+        int damageTime = (int) finalDamage;
+
+        if (victimTime - damageTime <= 0) handlePlayerDeath(victim, attacker);
+        else {
+            lastAttacker.put(victim, attacker);
+            removeTime(victim, damageTime);
+        }
+    }
+
     private void selectPlayersForMatch() {
         Collections.shuffle(getAvailablePlayers());
 
@@ -193,7 +206,6 @@ public class Match {
                     } else {
                         iterator.remove();
                         CLife.getInstance().getColorManager().removeColor(player);
-
                         getSpectators().add(player);
                         getDefeatedPlayers().put(player.getName(), getId());
                         CLife.getInstance().getServer().getPluginManager().callEvent(new MatchSpectatorEvent(Match.this, player));
@@ -220,7 +232,7 @@ public class Match {
         if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
         if (ConfigKeys.CHEST_ENABLED.getBoolean()) placeChests();
 
-        CLife.getInstance().getScheduler().runTaskTimer(() -> {
+        countdownTask = CLife.getInstance().getScheduler().runTaskTimer(() -> {
             if (getCountdown() > 0) {
                 getPlayers().forEach(player -> LifeUtils.sendTitle(player,
                         ConfigKeys.COUNTDOWN_TITLE
@@ -232,6 +244,7 @@ public class Match {
                                 .replace("{time}", String.valueOf(getCountdown()))));
                 countdown--;
             } else {
+                countdownTask.cancel();
                 startPlayerCountdown();
                 getStartingPlayers().clear();
                 CLife.getInstance().getServer().getPluginManager().callEvent(new MatchStartEvent(Match.this));
@@ -295,88 +308,6 @@ public class Match {
         }
     }
 
-
-    private void randomTeleport() {
-        World world = Bukkit.getWorld(id);
-        Location center = Objects.requireNonNull(world).getSpawnLocation();
-        double radius = ConfigKeys.RADIUS.getInt();
-
-        getPlayers().forEach(player -> {
-            Location teleportLocation = LifeUtils.findSafeLocation(center, radius);
-
-            if (teleportLocation != null) {
-                World word = teleportLocation.getWorld();
-                int x = teleportLocation.getBlockX();
-                int z = teleportLocation.getBlockZ();
-                int y = word.getHighestBlockYAt(x, z);
-                Location safeLocation = new Location(word, x, y + 1, z);
-                Block blockAbove = word.getBlockAt(safeLocation);
-
-                if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
-                else {
-                    int retries = 5;
-
-                    while (retries > 0 && blockAbove.getType() != Material.AIR) {
-                        safeLocation.setY(safeLocation.getY() + 1);
-                        blockAbove = word.getBlockAt(safeLocation);
-                        retries--;
-                    }
-
-                    if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
-                    else LifeLogger.warn("No safe location found for player " + player.getName());
-                }
-            } else {
-                LifeLogger.warn("No safe location found for player " + player.getName());
-            }
-        });
-    }
-
-    private void placeChests() {
-        World world = Bukkit.getWorld(id);
-        Location center = Objects.requireNonNull(world).getSpawnLocation();
-        double radius = ConfigKeys.RADIUS.getInt();
-
-        getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
-        chestLocations.clear();
-
-        for (int i = 0; i < ConfigKeys.CHEST_COUNT.getInt(); i++) {
-            Location chestLocation = LifeUtils.findSafeLocation(center, radius);
-
-            if (chestLocation != null) {
-                World word = chestLocation.getWorld();
-                int x = chestLocation.getBlockX();
-                int z = chestLocation.getBlockZ();
-                int y = word.getHighestBlockYAt(x, z);
-                Location safeLocation = new Location(word, x, y + 1, z);
-                Block blockAbove = word.getBlockAt(safeLocation);
-                int retries = 5;
-
-                while (retries > 0 && blockAbove.getType() != Material.AIR) {
-                    safeLocation.setY(safeLocation.getY() + 1);
-                    blockAbove = word.getBlockAt(safeLocation);
-                    retries--;
-                }
-
-                if (blockAbove.getType() == Material.AIR) {
-                    safeLocation.getBlock().setType(Material.CHEST);
-                    LifeUtils.fillChestWithLoot(safeLocation);
-                    chestLocations.add(safeLocation);
-                } else LifeLogger.warn("No safe location found for chest placement.");
-            } else LifeLogger.warn("No safe location found for chest placement.");
-        }
-    }
-
-    public void recordAttack(@NotNull Player attacker, @NotNull Player victim, double finalDamage) {
-        int victimTime = getTime(victim);
-        int damageTime = (int) finalDamage;
-
-        if (victimTime - damageTime <= 0) handlePlayerDeath(victim, attacker);
-        else {
-            lastAttacker.put(victim, attacker);
-            removeTime(victim, damageTime);
-        }
-    }
-
     private void handlePlayerDeath(@NotNull Player victim, @Nullable Player killer) {
         getPlayers().remove(victim);
         CLife.getInstance().getColorManager().removeColor(victim);
@@ -415,7 +346,8 @@ public class Match {
 
     private void initializePlayers() {
         getPlayers().forEach(player -> {
-            team.addEntry(player.getName());
+            Team team = getTeam(id);
+            team.addPlayer(player);
             player.getInventory().clear();
             player.getInventory().setArmorContents(null);
             player.setHealth(20.0);
@@ -436,6 +368,73 @@ public class Match {
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
         team.setOption(Team.Option.DEATH_MESSAGE_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
+    }
+
+    private void placeChests() {
+        World world = Bukkit.getWorld(id);
+        Location center = Objects.requireNonNull(world).getSpawnLocation();
+        double radius = ConfigKeys.RADIUS.getInt();
+
+        for (int i = 0; i < ConfigKeys.CHEST_COUNT.getInt(); i++) {
+            Location chestLocation = LifeUtils.findSafeLocation(center, radius);
+
+            if (chestLocation != null) {
+                World word = chestLocation.getWorld();
+                int x = chestLocation.getBlockX();
+                int z = chestLocation.getBlockZ();
+                int y = word.getHighestBlockYAt(x, z);
+                Location safeLocation = new Location(word, x, y + 1, z);
+                Block blockAbove = word.getBlockAt(safeLocation);
+                int retries = 5;
+
+                while (retries > 0 && blockAbove.getType() != Material.AIR) {
+                    safeLocation.setY(safeLocation.getY() + 1);
+                    blockAbove = word.getBlockAt(safeLocation);
+                    retries--;
+                }
+
+                if (blockAbove.getType() == Material.AIR) {
+                    safeLocation.getBlock().setType(Material.CHEST);
+                    LifeUtils.fillChestWithLoot(safeLocation);
+                    chestLocations.add(safeLocation);
+                } else LifeLogger.warn("No safe location found for chest placement.");
+            } else LifeLogger.warn("No safe location found for chest placement.");
+        }
+    }
+
+    private void randomTeleport() {
+        World world = Bukkit.getWorld(id);
+        Location center = Objects.requireNonNull(world).getSpawnLocation();
+        double radius = ConfigKeys.RADIUS.getInt();
+
+        getPlayers().forEach(player -> {
+            Location teleportLocation = LifeUtils.findSafeLocation(center, radius);
+
+            if (teleportLocation != null) {
+                World word = teleportLocation.getWorld();
+                int x = teleportLocation.getBlockX();
+                int z = teleportLocation.getBlockZ();
+                int y = word.getHighestBlockYAt(x, z);
+                Location safeLocation = new Location(word, x, y + 1, z);
+                Block blockAbove = word.getBlockAt(safeLocation);
+
+                if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
+                else {
+                    int retries = 5;
+
+                    while (retries > 0 && blockAbove.getType() != Material.AIR) {
+                        safeLocation.setY(safeLocation.getY() + 1);
+                        blockAbove = word.getBlockAt(safeLocation);
+                        retries--;
+                    }
+
+                    if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
+                    else LifeLogger.warn("No safe location found for player " + player.getName());
+                }
+            } else {
+                LifeLogger.warn("No safe location found for player " + player.getName());
+            }
+        });
     }
 }
 
