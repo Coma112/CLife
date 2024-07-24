@@ -192,13 +192,7 @@ public class LifeUtils {
         return uniqueID;
     }
 
-    public static World createWorld(@NotNull String worldName) {
-        return Bukkit.createWorld(new WorldCreator(worldName));
-    }
-
     public static void deleteWorld(@NotNull World world) {
-        if (world == null) return;
-
         Bukkit.getScheduler().runTask(CLife.getInstance(), () -> {
             Bukkit.unloadWorld(world, false);
             File worldFolder = world.getWorldFolder();
@@ -214,16 +208,18 @@ public class LifeUtils {
                 for (File f : files) deleteRecursively(f);
             }
         }
+
         file.delete();
     }
 
     private static String generateRandomID() {
         StringBuilder id = new StringBuilder();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             int index = getRandom().nextInt(getAlphabet().length());
             id.append(getAlphabet().charAt(index));
         }
+
         return id.toString();
     }
 }

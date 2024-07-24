@@ -22,6 +22,7 @@ world-radius: 15
 
 queue:
   maxplayer: 2
+  action-bar: "&a{queueSize} &7/ &a{queueMax}"
 
 # This section is running when the player's color is changing.
 
@@ -168,3 +169,11 @@ blocked-blocks:
   - "LAVA"
   - "FIRE"
   - "WATER"
+  - "OAK_LEAVES"
+  - "SPRUCE_LEAVES"
+  - "BIRCH_LEAVES"
+  - "JUNGLE_LEAVES"
+  - "ACACIA_LEAVES"
+  - "DARK_OAK_LEAVES"
+  - "AZALEA_LEAVES"
+  - "FLOWERING_AZALEA_LEAVES"

@@ -35,6 +35,7 @@ public enum ConfigKeys {
     HEALING_POTION("potions.healing"),
     REGENERATION_POTION("potions.regeneration"),
     STARTING_TIME("time"),
+    QUEUE_ACTIONBAR("queue.action-bar"),
 
     COLOR_BROADCAST("color.broadcast"),
     COLOR_PLAYER_TITLE("color.player-title"),

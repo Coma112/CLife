@@ -78,17 +78,26 @@ public class CommandLife {
 
     @Subcommand("stop")
     @CommandPermission("clife.stop")
-    public void stop(@NotNull Player player) {
-        Match match = CLife.getInstance().getMatch(player);
+    public void stop(@NotNull Player player, @NotNull @Default("none") String id) {
+        Match match;
 
-        if (match == null) return;
+        if (id.equals("none")) match = CLife.getInstance().getMatch(player);
+        else match = Match.getMatchById(id);
 
-        if (!match.isInMatch(player)) {
-            player.sendMessage(MessageKeys.NOT_IN_MATCH.getMessage());
+        if (match == null) {
+            player.sendMessage(MessageKeys.NO_MATCH_FOUND.getMessage());
             return;
         }
 
+
         match.endMatch();
+    }
+
+    @Subcommand("stopall")
+    @CommandPermission("clife.stopall")
+    public void stopAll(@NotNull Player player) {
+        CLife.getActiveMatches().forEach(Match::endMatch);
+        player.sendMessage(MessageKeys.SUCCESSFUL_STOPALL.getMessage());
     }
 
     @Subcommand("change")
@@ -111,11 +120,27 @@ public class CommandLife {
         switch (prefix) {
             case "+" -> {
                 match.addTime(target, time);
-                LifeLogger.info("Added " + time + " seconds to " + target.getName());
+                player.sendMessage(MessageKeys.SUCCESSFUL_ADD_PLAYER
+                        .getMessage()
+                        .replace("{target}", target.getName())
+                        .replace("{time}", LifeUtils.formatTime(time)));
+
+                target.sendMessage(MessageKeys.SUCCESSFUL_ADD_TARGET
+                        .getMessage()
+                        .replace("{player}", player.getName())
+                        .replace("{time}", LifeUtils.formatTime(time)));
             }
             case "-" -> {
                 match.removeTime(target, time);
-                LifeLogger.info("Removed " + time + " seconds from " + target.getName());
+                target.sendMessage(MessageKeys.SUCCESSFUL_REMOVE_TARGET
+                        .getMessage()
+                        .replace("{player}", player.getName())
+                        .replace("{time}", LifeUtils.formatTime(time)));
+
+                player.sendMessage(MessageKeys.SUCCESSFUL_REMOVE_PLAYER
+                        .getMessage()
+                        .replace("{target}", player.getName())
+                        .replace("{time}", LifeUtils.formatTime(time)));
             }
         }
     }
@@ -138,35 +163,6 @@ public class CommandLife {
         }
 
         LifeUtils.updateMatchColor(match, player, target, color);
-    }
-
-    @Subcommand("setcenter")
-    @CommandPermission("clife.setcenter")
-    public void setCenter(@NotNull Player player) {
-        if (!ConfigKeys.RTP_ENABLED.getBoolean()) {
-            player.sendMessage(MessageKeys.RTP_DISABLED.getMessage());
-            return;
-        }
-
-        CLife.getInstance().getConfiguration().set("match-center", LifeUtils.convertLocationToString(player.getLocation()));
-        player.sendMessage(MessageKeys.SUCCESSFUL_CENTER.getMessage());
-    }
-
-    @Subcommand("setradius")
-    @CommandPermission("clife.setradius")
-    public void setRadius(@NotNull Player player, double radius) {
-        if (!ConfigKeys.RTP_ENABLED.getBoolean()) {
-            player.sendMessage(MessageKeys.RTP_DISABLED.getMessage());
-            return;
-        }
-
-        if (radius <= 0) {
-            player.sendMessage(MessageKeys.CANT_BE_NULL.getMessage());
-            return;
-        }
-
-        CLife.getInstance().getConfiguration().set("match-radius", radius);
-        player.sendMessage(MessageKeys.SUCCESSFUL_RADIUS.getMessage());
     }
 
     @Subcommand("setlobby")

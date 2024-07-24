@@ -19,12 +19,19 @@ public enum MessageKeys {
     SUCCESSFUL_SETCOLOR("messages.successful-setcolor"),
     INCORRECT_LOCATION("messages.no-location-configured"),
     SUCCESSFUL_SETLOBBY("messages.successful-setlobby"),
+    NO_MATCH_FOUND("messages.no-match-found"),
     NO_LOBBY("messages.no-lobby"),
     IN_QUEUE("messages.in-queue"),
     QUEUE_UPDATE_LEFT("messages.queue-update-left"),
     QUEUE_UPDATE_JOIN("messages.queue-update-join"),
     REMOVE_FROM_QUEUE("messages.removed-from-queue"),
     NOT_IN_QUEUE("messages.not-in-queue"),
+    MAX_QUEUE("messages.queue-max"),
+    SUCCESSFUL_ADD_PLAYER("messages.successful-add-time-player"),
+    SUCCESSFUL_ADD_TARGET("messages.successful-add-time-target"),
+    SUCCESSFUL_REMOVE_PLAYER("messages.successful-remove-time-player"),
+    SUCCESSFUL_REMOVE_TARGET("messages.successful-remove-time-target"),
+    SUCCESSFUL_STOPALL("messages.successful-stopall"),
     NOT_ENOUGH_PLAYERS("messages.not-enough-players");
 
     private final String path;

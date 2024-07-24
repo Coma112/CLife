@@ -17,6 +17,8 @@ import org.bukkit.block.Block;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,56 +51,32 @@ public class Match {
     @Getter private GameState gameState;
     @Getter private World world;
 
+    private Team team;
+
     public Match() {
         setStatus(GameState.WAITING);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                world = WorldGenerator.generateWorld();
+        CLife.getInstance().getScheduler().runTask(() -> {
+            world = WorldGenerator.generateWorld();
 
-                if (world == null) {
-                    LifeLogger.warn("World generation failed. Match cannot be started.");
-                    return;
-                }
-
-                id = world.getName();
-                activeMatchesById.put(id, Match.this);
-                WorldGenerator.setfalse();
-                setupMatchWorld(world);
-                selectPlayersForMatch(id);
-
-                startCountdown();
-                startActionBarUpdate();
-
-                CLife.getActiveMatches().add(Match.this);
-                initializePlayers();
-                getAvailablePlayers().clear();
-
+            if (world == null) {
+                LifeLogger.warn("World generation failed. Match cannot be started.");
+                return;
             }
-        }.runTask(CLife.getInstance());
-    }
 
+            id = world.getName();
+            getActiveMatchesById().put(getId(), Match.this);
+            WorldGenerator.setfalse();
+            setupMatchWorld(world);
+            selectPlayersForMatch();
 
-    private void setupMatchWorld(World world) {
-        if (ConfigKeys.ALWAYS_DAY.getBoolean()) {
-            world.setTime(6000);
-            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        }
-    }
+            setupTeam();
+            startCountdown();
+            startActionBarUpdate();
 
-    private void initializePlayers() {
-        getPlayers().forEach(player -> {
-            player.getInventory().clear();
-            player.getInventory().setArmorContents(null);
-            player.setHealth(20.0);
-            player.setExp(0.0f);
-            player.setFoodLevel(20);
-            player.setFlying(false);
-            player.setAllowFlight(false);
-            player.setGameMode(GameMode.SURVIVAL);
-            player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
-            getPlayerTimes().put(player, ConfigKeys.STARTING_TIME.getInt());
+            CLife.getActiveMatches().add(Match.this);
+            initializePlayers();
+            getAvailablePlayers().clear();
         });
     }
 
@@ -112,13 +90,11 @@ public class Match {
         if (matchEnded) return;
         matchEnded = true;
 
-        // Clear chest locations safely
         synchronized (getChestLocations()) {
             getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
             getChestLocations().clear();
         }
 
-        // Safely remove players
         synchronized (getPlayers()) {
             Iterator<Player> playerIterator = getPlayers().iterator();
             while (playerIterator.hasNext()) {
@@ -129,10 +105,10 @@ public class Match {
                 player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 CLife.getInstance().getColorManager().removeColor(player);
                 playerIterator.remove();
+                team.removeEntry(player.getName());
             }
         }
 
-        // Safely remove spectators
         synchronized (getSpectators()) {
             Iterator<Player> spectatorIterator = getSpectators().iterator();
             while (spectatorIterator.hasNext()) {
@@ -140,10 +116,10 @@ public class Match {
                 Player player = spectatorIterator.next();
                 player.getInventory().clear();
                 player.setGameMode(GameMode.SURVIVAL);
-                System.out.println("Teleporting" + player.getName() + "to" + LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")) );
                 player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 CLife.getInstance().getColorManager().removeColor(player);
                 spectatorIterator.remove();
+                team.removeEntry(player.getName());
             }
         }
 
@@ -195,7 +171,7 @@ public class Match {
         this.gameState = gameState;
     }
 
-    private void selectPlayersForMatch(String id) {
+    private void selectPlayersForMatch() {
         Collections.shuffle(getAvailablePlayers());
 
         for (int i = 0; i < Math.min(ConfigKeys.MINIMUM_PLAYERS.getInt(), getAvailablePlayers().size()); i++) getPlayers().add(getAvailablePlayers().get(i));
@@ -204,33 +180,30 @@ public class Match {
     private void startPlayerCountdown() {
         setStatus(GameState.PLAYING);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                synchronized (getPlayerTimes()) {
-                    Iterator<Player> iterator = getPlayers().iterator();
+        CLife.getInstance().getScheduler().runTaskTimer(() -> {
+            synchronized (getPlayerTimes()) {
+                Iterator<Player> iterator = getPlayers().iterator();
 
-                    while (iterator.hasNext()) {
-                        Player player = iterator.next();
-                        int remaining = getPlayerTimes().getOrDefault(player, 0);
+                while (iterator.hasNext()) {
+                    Player player = iterator.next();
+                    int remaining = getPlayerTimes().getOrDefault(player, 0);
 
-                        if (remaining > 0) {
-                            getPlayerTimes().put(player, remaining - 1);
-                        } else {
-                            iterator.remove();
-                            CLife.getInstance().getColorManager().removeColor(player);
+                    if (remaining > 0) {
+                        getPlayerTimes().put(player, remaining - 1);
+                    } else {
+                        iterator.remove();
+                        CLife.getInstance().getColorManager().removeColor(player);
 
-                            getSpectators().add(player);
-                            getDefeatedPlayers().put(player.getName(), getId());
-                            CLife.getInstance().getServer().getPluginManager().callEvent(new MatchSpectatorEvent(Match.this, player));
-                        }
+                        getSpectators().add(player);
+                        getDefeatedPlayers().put(player.getName(), getId());
+                        CLife.getInstance().getServer().getPluginManager().callEvent(new MatchSpectatorEvent(Match.this, player));
                     }
-
-                    updatePlayerColor();
-                    checkForWinner();
                 }
+
+                updatePlayerColor();
+                checkForWinner();
             }
-        }.runTaskTimer(CLife.getInstance(), 0L, 20L);
+        }, 0L, 20L);
     }
 
 
@@ -238,7 +211,7 @@ public class Match {
         setStatus(GameState.STARTING);
         countdown = ConfigKeys.COUNTDOWN.getInt();
         World world = Bukkit.getWorld(id);
-        Location center = world.getSpawnLocation();
+        Location center = Objects.requireNonNull(world).getSpawnLocation();
         double radius = ConfigKeys.RADIUS.getInt();
 
         getStartingPlayers().addAll(getPlayers());
@@ -247,42 +220,35 @@ public class Match {
         if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
         if (ConfigKeys.CHEST_ENABLED.getBoolean()) placeChests();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (getCountdown() > 0) {
-                    getPlayers().forEach(player -> LifeUtils.sendTitle(player,
-                            ConfigKeys.COUNTDOWN_TITLE
-                                    .getString()
-                                    .replace("{time}", String.valueOf(getCountdown())),
+        CLife.getInstance().getScheduler().runTaskTimer(() -> {
+            if (getCountdown() > 0) {
+                getPlayers().forEach(player -> LifeUtils.sendTitle(player,
+                        ConfigKeys.COUNTDOWN_TITLE
+                                .getString()
+                                .replace("{time}", String.valueOf(getCountdown())),
 
-                            ConfigKeys.COUNTDOWN_SUBTITLE
-                                    .getString()
-                                    .replace("{time}", String.valueOf(getCountdown()))));
-                    countdown--;
-                } else {
-                    cancel();
-                    startPlayerCountdown();
-                    getStartingPlayers().clear();
-                    CLife.getInstance().getServer().getPluginManager().callEvent(new MatchStartEvent(Match.this));
-                }
+                        ConfigKeys.COUNTDOWN_SUBTITLE
+                                .getString()
+                                .replace("{time}", String.valueOf(getCountdown()))));
+                countdown--;
+            } else {
+                startPlayerCountdown();
+                getStartingPlayers().clear();
+                CLife.getInstance().getServer().getPluginManager().callEvent(new MatchStartEvent(Match.this));
             }
-        }.runTaskTimer(CLife.getInstance(), 0L, 20L);
+        }, 0L, 20L);
     }
 
     private void startActionBarUpdate() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                getPlayers().forEach(player -> {
-                    Color playerColor = getColor(player);
+        CLife.getInstance().getScheduler().runTaskTimer(() -> {
+            getPlayers().forEach(player -> {
+                Color playerColor = getColor(player);
 
-                    LifeUtils.sendActionBar(player, ConfigKeys.ACTION_BAR.getString()
-                            .replace("{time}", LifeUtils.formatTime(getTime(player)))
-                            .replace("{color}", playerColor != null ? playerColor.getColorCode() : "&2"));
-                });
-            }
-        }.runTaskTimer(CLife.getInstance(), 0L, 20L);
+                LifeUtils.sendActionBar(player, ConfigKeys.ACTION_BAR.getString()
+                        .replace("{time}", LifeUtils.formatTime(getTime(player)))
+                        .replace("{color}", playerColor != null ? playerColor.getColorCode() : "&2"));
+            });
+        }, 0L, 20L);
     }
 
     private void updatePlayerColor() {
@@ -332,40 +298,32 @@ public class Match {
 
     private void randomTeleport() {
         World world = Bukkit.getWorld(id);
-        Location center = world.getSpawnLocation();
+        Location center = Objects.requireNonNull(world).getSpawnLocation();
         double radius = ConfigKeys.RADIUS.getInt();
-
-        if (center == null) {
-            LifeLogger.warn("Match center location is not configured correctly. Cannot teleport players.");
-            return;
-        }
 
         getPlayers().forEach(player -> {
             Location teleportLocation = LifeUtils.findSafeLocation(center, radius);
+
             if (teleportLocation != null) {
                 World word = teleportLocation.getWorld();
                 int x = teleportLocation.getBlockX();
                 int z = teleportLocation.getBlockZ();
-
                 int y = word.getHighestBlockYAt(x, z);
                 Location safeLocation = new Location(word, x, y + 1, z);
-
                 Block blockAbove = word.getBlockAt(safeLocation);
-                if (blockAbove.getType() == Material.AIR) {
-                    player.teleport(safeLocation);
-                } else {
+
+                if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
+                else {
                     int retries = 5;
+
                     while (retries > 0 && blockAbove.getType() != Material.AIR) {
                         safeLocation.setY(safeLocation.getY() + 1);
                         blockAbove = word.getBlockAt(safeLocation);
                         retries--;
                     }
 
-                    if (blockAbove.getType() == Material.AIR) {
-                        player.teleport(safeLocation);
-                    } else {
-                        LifeLogger.warn("No safe location found for player " + player.getName());
-                    }
+                    if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
+                    else LifeLogger.warn("No safe location found for player " + player.getName());
                 }
             } else {
                 LifeLogger.warn("No safe location found for player " + player.getName());
@@ -375,19 +333,10 @@ public class Match {
 
     private void placeChests() {
         World world = Bukkit.getWorld(id);
-        Location center = world.getSpawnLocation();
+        Location center = Objects.requireNonNull(world).getSpawnLocation();
         double radius = ConfigKeys.RADIUS.getInt();
 
-        if (center == null) {
-            LifeLogger.warn("Match center location is not configured correctly. Cannot place chests.");
-            return;
-        }
-
-        for (Location location : getChestLocations()) {
-            if (location.getBlock().getType() == Material.CHEST) {
-                location.getBlock().setType(Material.AIR);
-            }
-        }
+        getChestLocations().forEach(location -> location.getBlock().setType(Material.AIR));
         chestLocations.clear();
 
         for (int i = 0; i < ConfigKeys.CHEST_COUNT.getInt(); i++) {
@@ -398,7 +347,6 @@ public class Match {
                 int x = chestLocation.getBlockX();
                 int z = chestLocation.getBlockZ();
                 int y = word.getHighestBlockYAt(x, z);
-
                 Location safeLocation = new Location(word, x, y + 1, z);
                 Block blockAbove = word.getBlockAt(safeLocation);
                 int retries = 5;
@@ -413,12 +361,8 @@ public class Match {
                     safeLocation.getBlock().setType(Material.CHEST);
                     LifeUtils.fillChestWithLoot(safeLocation);
                     chestLocations.add(safeLocation);
-                } else {
-                    LifeLogger.warn("No safe location found for chest placement.");
-                }
-            } else {
-                LifeLogger.warn("No safe location found for chest placement.");
-            }
+                } else LifeLogger.warn("No safe location found for chest placement.");
+            } else LifeLogger.warn("No safe location found for chest placement.");
         }
     }
 
@@ -460,6 +404,38 @@ public class Match {
 
         updatePlayerColor();
         checkForWinner();
+    }
+
+    private void setupMatchWorld(@NotNull World world) {
+        if (ConfigKeys.ALWAYS_DAY.getBoolean()) {
+            world.setTime(6000);
+            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        }
+    }
+
+    private void initializePlayers() {
+        getPlayers().forEach(player -> {
+            team.addEntry(player.getName());
+            player.getInventory().clear();
+            player.getInventory().setArmorContents(null);
+            player.setHealth(20.0);
+            player.setExp(0.0f);
+            player.setFoodLevel(20);
+            player.setFlying(false);
+            player.setAllowFlight(false);
+            player.setGameMode(GameMode.SURVIVAL);
+            player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
+            getPlayerTimes().put(player, ConfigKeys.STARTING_TIME.getInt());
+        });
+    }
+
+    private void setupTeam() {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        team = scoreboard.registerNewTeam(id);
+
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
+        team.setOption(Team.Option.DEATH_MESSAGE_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
+        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
     }
 }
 

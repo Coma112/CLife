@@ -1,6 +1,5 @@
 package coma112.clife.listeners;
 
-import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeUtils;

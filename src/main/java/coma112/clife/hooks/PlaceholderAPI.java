@@ -54,6 +54,11 @@ public class PlaceholderAPI extends PlaceholderExpansion {
                 else yield LifeUtils.formatTime(match.getTime(player));
             }
 
+            case "match_id" -> {
+                if (match == null) yield "";
+                else yield match.getId();
+            }
+
             case "wins" -> String.valueOf(CLife.getDatabase().getWins(player));
             case "deaths" -> String.valueOf(CLife.getDatabase().getDeaths(player));
             case "kills" -> String.valueOf(CLife.getDatabase().getKills(player));
