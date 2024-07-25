@@ -50,7 +50,6 @@ public class Match {
     @Getter private int countdown;
     @Getter private boolean matchEnded = false;
     @Getter private GameState gameState;
-    @Getter private Team team;
 
     public Match(@NotNull World world) {
         setStatus(GameState.WAITING);
@@ -68,7 +67,6 @@ public class Match {
             setupMatchWorld(world);
             selectPlayersForMatch();
 
-            setupTeam();
             startCountdown();
             startActionBarUpdate();
 
@@ -87,7 +85,6 @@ public class Match {
         setStatus(GameState.RESTARTING);
         if (matchEnded) return;
         matchEnded = true;
-        getTeam().unregister();
 
         synchronized (getChestLocations()) {
             getChestLocations().stream()
@@ -138,7 +135,10 @@ public class Match {
         getLastAttacker().clear();
         CLife.getInstance().getServer().getPluginManager().callEvent(new MatchEndEvent(Match.this));
         winner = null;
+
+        Bukkit.getOnlinePlayers().forEach(this::showAllPlayers);
     }
+
 
 
     public boolean isInMatch(@NotNull Player player) {
@@ -228,6 +228,7 @@ public class Match {
 
         getStartingPlayers().addAll(getPlayers());
         LifeUtils.setWorldBorder(center, radius);
+        getPlayers().forEach(this::hideOtherPlayers);
 
         if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
         if (ConfigKeys.CHEST_ENABLED.getBoolean()) placeChests();
@@ -251,6 +252,7 @@ public class Match {
             }
         }, 0L, 20L);
     }
+
 
     private void startActionBarUpdate() {
         CLife.getInstance().getScheduler().runTaskTimer(() -> {
@@ -346,8 +348,6 @@ public class Match {
 
     private void initializePlayers() {
         getPlayers().forEach(player -> {
-            Team team = getTeam(id);
-            team.addPlayer(player);
             player.getInventory().clear();
             player.getInventory().setArmorContents(null);
             player.setHealth(20.0);
@@ -359,15 +359,6 @@ public class Match {
             player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
             getPlayerTimes().put(player, ConfigKeys.STARTING_TIME.getInt());
         });
-    }
-
-    private void setupTeam() {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        team = scoreboard.registerNewTeam(id);
-
-        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
-        team.setOption(Team.Option.DEATH_MESSAGE_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
-        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
     }
 
     private void placeChests() {
@@ -434,6 +425,24 @@ public class Match {
             } else {
                 LifeLogger.warn("No safe location found for player " + player.getName());
             }
+        });
+    }
+
+    private void hideOtherPlayers(@NotNull Player player) {
+        World matchWorld = Bukkit.getWorld(getId());
+
+        Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
+            if (!otherPlayer.getWorld().equals(matchWorld)) player.hidePlayer(CLife.getInstance(), otherPlayer);
+            else player.showPlayer(CLife.getInstance(), otherPlayer);
+        });
+    }
+
+    private void showAllPlayers(@NotNull Player player) {
+        World matchWorld = Bukkit.getWorld(getId());
+
+        Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
+            if (otherPlayer.getWorld().equals(matchWorld)) player.showPlayer(CLife.getInstance(), otherPlayer);
+            else player.hidePlayer(CLife.getInstance(), otherPlayer);
         });
     }
 }
