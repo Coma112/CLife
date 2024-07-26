@@ -2,6 +2,7 @@ package coma112.clife;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
+import com.onarandombox.MultiverseCore.MultiverseCore;
 import coma112.clife.config.Config;
 import coma112.clife.database.AbstractDatabase;
 import coma112.clife.database.MySQL;
@@ -16,6 +17,7 @@ import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +36,7 @@ public final class CLife extends JavaPlugin {
     private static Config config;
     private static Language language;
     private static TaskScheduler scheduler;
+    @Getter private static MultiverseCore core;
 
     @Override
     public void onLoad() {
@@ -53,6 +56,8 @@ public final class CLife extends JavaPlugin {
         PlaceholderAPI.registerHook();
 
         new Metrics(this, 22532);
+
+        core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
     }
 
     @Override

@@ -17,12 +17,10 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
-    maven {
-        url 'https://jitpack.io'
-    }
-    maven {
-        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
-    }
+
+    maven { url 'https://jitpack.io' }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url = "https://repo.onarandombox.com/content/groups/public/" }
 }
 
 dependencies {
@@ -35,6 +33,7 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.bstats:bstats-bukkit:3.0.2'
     implementation 'com.github.Anon8281:UniversalScheduler:0.1.6'
+    compileOnly 'com.onarandombox.multiversecore:Multiverse-Core:4.3.1'
 }
 
 java {

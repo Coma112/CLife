@@ -199,24 +199,11 @@ public class LifeUtils {
         }
 
         CLife.getInstance().getScheduler().runTask(() -> {
-            Bukkit.unloadWorld(world, false);
-            File worldFolder = world.getWorldFolder();
+            CLife.getCore().getMVWorldManager().unloadWorld(world.getName());
+            CLife.getCore().getMVWorldManager().deleteWorld(world.getName());
+
             CLife.getDatabase().removeWorldID(world.getName());
-            deleteRecursively(worldFolder);
         });
-    }
-
-
-    private static void deleteRecursively(@NotNull File file) {
-        if (file.isDirectory()) {
-            File[] files = file.listFiles();
-
-            if (files != null) {
-                for (File f : files) deleteRecursively(f);
-            }
-        }
-
-        file.delete();
     }
 
     private static String generateRandomID() {

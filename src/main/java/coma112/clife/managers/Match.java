@@ -13,12 +13,16 @@ import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
 import coma112.clife.world.WorldGenerator;
 import lombok.Getter;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.GameMode;
+import org.bukkit.GameRule;
+
 
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,12 +60,8 @@ public class Match {
 
         CLife.getInstance().getScheduler().runTask(() -> {
 
-            if (world == null) {
-                LifeLogger.warn("World generation failed. Match cannot be started.");
-                return;
-            }
-
             id = world.getName();
+
             getActiveMatchesById().put(getId(), Match.this);
             WorldGenerator.setFalse();
             setupMatchWorld(world);
@@ -222,12 +222,8 @@ public class Match {
     private void startCountdown() {
         setStatus(GameState.STARTING);
         countdown = ConfigKeys.COUNTDOWN.getInt();
-        World world = Bukkit.getWorld(id);
-        Location center = Objects.requireNonNull(world).getSpawnLocation();
-        double radius = ConfigKeys.RADIUS.getInt();
 
         getStartingPlayers().addAll(getPlayers());
-        LifeUtils.setWorldBorder(center, radius);
         getPlayers().forEach(this::hideOtherPlayers);
 
         if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
@@ -430,19 +426,35 @@ public class Match {
 
     private void hideOtherPlayers(@NotNull Player player) {
         World matchWorld = Bukkit.getWorld(getId());
-
         Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
-            if (!otherPlayer.getWorld().equals(matchWorld)) player.hidePlayer(CLife.getInstance(), otherPlayer);
-            else player.showPlayer(CLife.getInstance(), otherPlayer);
+            if (otherPlayer.getWorld().equals(matchWorld)) {
+                if (player.canSee(otherPlayer)) {
+                    player.hidePlayer(CLife.getInstance(), otherPlayer);
+                    System.out.println("Hiding " + otherPlayer.getName() + " from " + player.getName());
+                }
+            } else {
+                if (player.canSee(otherPlayer)) {
+                    player.hidePlayer(CLife.getInstance(), otherPlayer);
+                    System.out.println("Hiding " + otherPlayer.getName() + " from " + player.getName());
+                }
+            }
         });
     }
 
     private void showAllPlayers(@NotNull Player player) {
         World matchWorld = Bukkit.getWorld(getId());
-
         Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
-            if (otherPlayer.getWorld().equals(matchWorld)) player.showPlayer(CLife.getInstance(), otherPlayer);
-            else player.hidePlayer(CLife.getInstance(), otherPlayer);
+            if (otherPlayer.getWorld().equals(matchWorld)) {
+                if (!player.canSee(otherPlayer)) {
+                    player.showPlayer(CLife.getInstance(), otherPlayer);
+                    System.out.println("Showing " + otherPlayer.getName() + " to " + player.getName());
+                }
+            } else {
+                if (player.canSee(otherPlayer)) {
+                    player.showPlayer(CLife.getInstance(), otherPlayer);
+                    System.out.println("Showing " + otherPlayer.getName() + " to " + player.getName());
+                }
+            }
         });
     }
 }

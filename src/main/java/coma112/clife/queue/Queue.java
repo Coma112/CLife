@@ -58,6 +58,7 @@ public class Queue {
         CLife.getInstance().getScheduler().runTaskLater(() -> {
             List<Player> playersToProcess;
             World world = WorldGenerator.generateWorld();
+
             synchronized (getQueue()) {
                 if (getQueue().size() < ConfigKeys.QUEUE_MAX.getInt()) return;
                 playersToProcess = new ArrayList<>(getQueue().subList(0, ConfigKeys.QUEUE_MAX.getInt()));
