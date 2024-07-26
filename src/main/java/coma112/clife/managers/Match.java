@@ -101,9 +101,9 @@ public class Match {
 
             while (playerIterator.hasNext()) {
                 Player player = playerIterator.next();
+                player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 player.getInventory().clear();
                 player.setGameMode(GameMode.SURVIVAL);
-                player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 CLife.getInstance().getColorManager().removeColor(player);
                 playerIterator.remove();
             }
@@ -114,9 +114,9 @@ public class Match {
 
             while (spectatorIterator.hasNext()) {
                 Player player = spectatorIterator.next();
+                player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 player.getInventory().clear();
                 player.setGameMode(GameMode.SURVIVAL);
-                player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
                 CLife.getInstance().getColorManager().removeColor(player);
                 spectatorIterator.remove();
             }
@@ -137,7 +137,12 @@ public class Match {
         winner = null;
     }
 
-
+    public void removePlayer(@NotNull Player player) {
+        getSpectators().remove(player);
+        player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
+        player.getInventory().clear();
+        player.setGameMode(GameMode.SURVIVAL);
+    }
 
     public boolean isInMatch(@NotNull Player player) {
         return getPlayers().contains(player);
@@ -171,14 +176,19 @@ public class Match {
         this.gameState = gameState;
     }
 
-    public void recordAttack(@NotNull Player attacker, @NotNull Player victim, double finalDamage) {
+    public void recordAttack(@Nullable Player attacker, @NotNull Player victim, double finalDamage) {
         int victimTime = getTime(victim);
         int damageTime = (int) finalDamage;
 
-        if (victimTime - damageTime <= 0) handlePlayerDeath(victim, attacker);
-        else {
-            lastAttacker.put(victim, attacker);
-            removeTime(victim, damageTime);
+        if (attacker != null) {
+            if (victimTime - damageTime <= 0) handlePlayerDeath(victim, attacker);
+            else {
+                lastAttacker.put(victim, attacker);
+                removeTime(victim, damageTime);
+            }
+        } else {
+            if (victimTime - damageTime <= 0) handlePlayerDeath(victim, null);
+            else removeTime(victim, damageTime);
         }
     }
 
@@ -211,7 +221,6 @@ public class Match {
                 }
 
                 updatePlayerColor();
-                checkForWinner();
             }
         }, 0L, 20L);
     }
@@ -223,8 +232,9 @@ public class Match {
 
         getStartingPlayers().addAll(getPlayers());
 
-        if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
         if (ConfigKeys.CHEST_ENABLED.getBoolean()) placeChests();
+        if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
+        else getPlayers().forEach(player -> player.teleport(Objects.requireNonNull(Bukkit.getWorld(getId())).getSpawnLocation()));
 
         countdownTask = CLife.getInstance().getScheduler().runTaskTimer(() -> {
             if (getCountdown() > 0) {
@@ -296,9 +306,23 @@ public class Match {
                                 .getString()
                                 .replace("{winner}", getWinner().getName())));
 
+                getSpectators().forEach(player -> player.sendMessage(ConfigKeys.END_BROADCAST
+                        .getString()
+                        .replace("{winner}", getWinner().getName())));
+
+                getSpectators().forEach(players -> LifeUtils.sendTitle(players,
+                        ConfigKeys.END_TITLE
+                                .getString()
+                                .replace("{winner}", getWinner().getName()),
+
+                        ConfigKeys.END_SUBTITLE
+                                .getString()
+                                .replace("{winner}", getWinner().getName())));
+
                 CLife.getDatabase().addWin(getWinner());
 
             }
+
             endMatch();
         }
     }
@@ -387,7 +411,7 @@ public class Match {
     }
 
     private void randomTeleport() {
-        World world = Bukkit.getWorld(id);
+        World world = Bukkit.getWorld(getId());
         Location center = Objects.requireNonNull(world).getSpawnLocation();
         double radius = ConfigKeys.RADIUS.getInt();
 
@@ -395,12 +419,12 @@ public class Match {
             Location teleportLocation = LifeUtils.findSafeLocation(center, radius);
 
             if (teleportLocation != null) {
-                World word = teleportLocation.getWorld();
+                World world2 = teleportLocation.getWorld();
                 int x = teleportLocation.getBlockX();
                 int z = teleportLocation.getBlockZ();
-                int y = word.getHighestBlockYAt(x, z);
-                Location safeLocation = new Location(word, x, y + 1, z);
-                Block blockAbove = word.getBlockAt(safeLocation);
+                int y = world2.getHighestBlockYAt(x, z);
+                Location safeLocation = new Location(world2, x, y + 1, z);
+                Block blockAbove = world2.getBlockAt(safeLocation);
 
                 if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
                 else {
@@ -408,7 +432,7 @@ public class Match {
 
                     while (retries > 0 && blockAbove.getType() != Material.AIR) {
                         safeLocation.setY(safeLocation.getY() + 1);
-                        blockAbove = word.getBlockAt(safeLocation);
+                        blockAbove = world2.getBlockAt(safeLocation);
                         retries--;
                     }
 

@@ -24,6 +24,23 @@ queue:
   maxplayer: 2
   action-bar: "&a{queueSize} &7/ &a{queueMax}"
 
+spectator:
+  leave-item:
+    amount: 1
+    material: BARRIER
+    name: "&c&lLEAVE MATCH"
+    lore:
+      - ""
+      - "&7Click with this item to leave the match."
+  playerfinder-item:
+    amount: 1
+    material: COMPASS
+    name: "&a&lALIVE PLAYERS"
+    lore:
+      - ""
+      - "&7Click with this item to"
+      - "&7Find the alive players in the match"
+
 # This section is running when the player's color is changing.
 
 color:

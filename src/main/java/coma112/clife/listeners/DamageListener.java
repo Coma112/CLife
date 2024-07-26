@@ -18,6 +18,8 @@ public class DamageListener implements Listener {
     @EventHandler
     public void onEntityDamage(final EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player victim) {
+            Match match = Match.getMatchById(victim.getLocation().getWorld().getName());
+
             Player damager = null;
 
             if (event.getDamager() instanceof Player) {
@@ -26,21 +28,22 @@ public class DamageListener implements Listener {
                 if (projectile.getShooter() instanceof Player) damager = (Player) projectile.getShooter();
             }
 
+            if (match.getSpectators().contains(damager)) {
+                event.setCancelled(true);
+                return;
+            }
+
             if (damager != null) {
-                Match match = Match.getMatchById(victim.getLocation().getWorld().getName());
-
-                if (match != null) {
-                    if (!ConfigKeys.EVERYONE_CAN_ATTACK.getBoolean() && !match.getColor(damager).canAttack(match.getColor(victim))) {
-                        event.setCancelled(true);
-                        return;
-                    }
-
-                    match.addTime(damager, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
-                    LifeUtils.sendTitle(damager, "&a+ " + LifeUtils.formatTime(ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()), "");
-                    match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()));
-                    LifeUtils.sendTitle(victim, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
-                    match.recordAttack(damager, victim, event.getFinalDamage());
+                if (!ConfigKeys.EVERYONE_CAN_ATTACK.getBoolean() && !match.getColor(damager).canAttack(match.getColor(victim))) {
+                    event.setCancelled(true);
+                    return;
                 }
+
+                match.addTime(damager, (ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()));
+                LifeUtils.sendTitle(damager, "&a+ " + LifeUtils.formatTime(ConfigKeys.KILLER_DAMAGE.getInt() * (int) event.getDamage()), "");
+                match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()));
+                LifeUtils.sendTitle(victim, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
+                match.recordAttack(damager, victim, event.getFinalDamage());
             }
         }
     }
@@ -62,39 +65,10 @@ public class DamageListener implements Listener {
                          CAMPFIRE,
                          FALL -> {
                         match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()));
+                        match.recordAttack(null, victim, event.getFinalDamage());
                         LifeUtils.sendTitle(victim, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDamage()), "");
                     }
                 }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityExplode(final EntityExplodeEvent event) {
-        Match match = null;
-        for (Block block : event.blockList()) {
-            for (Player player : block.getWorld().getPlayers()) {
-                if (player.getLocation().distance(block.getLocation()) < 5) {
-                    if (match == null) match = Match.getMatchById(player.getLocation().getWorld().getName());;
-
-                    if (match != null) {
-                        match.removeTime(player, (ConfigKeys.DAMAGE.getInt() * 10));
-                        LifeUtils.sendTitle(player, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt() * 10), "");
-                    }
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityCombust(final EntityCombustEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof Player victim) {
-            Match match = Match.getMatchById(victim.getLocation().getWorld().getName());
-
-            if (match != null) {
-                match.removeTime(victim, (ConfigKeys.DAMAGE.getInt() * (int) event.getDuration()));
-                LifeUtils.sendTitle(victim, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt() * (int) event.getDuration()), "");
             }
         }
     }
@@ -120,6 +94,36 @@ public class DamageListener implements Listener {
                 CLife.getDatabase().addDeath(player);
                 match.getPlayers().forEach(winner -> CLife.getDatabase().addWin(winner));
                 match.endMatch();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityExplode(final EntityExplodeEvent event) {
+        Match match = null;
+        for (Block block : event.blockList()) {
+            for (Player player : block.getWorld().getPlayers()) {
+                if (player.getLocation().distance(block.getLocation()) < 5) {
+                    if (match == null) match = Match.getMatchById(player.getLocation().getWorld().getName());;
+
+                    if (match != null) {
+                        match.removeTime(player, (ConfigKeys.DAMAGE.getInt()));
+                        LifeUtils.sendTitle(player, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt()), "");
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityCombust(final EntityCombustEvent event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof Player victim) {
+            Match match = Match.getMatchById(victim.getLocation().getWorld().getName());
+
+            if (match != null) {
+                match.removeTime(victim, (ConfigKeys.DAMAGE.getInt()));
+                LifeUtils.sendTitle(victim, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt()), "");
             }
         }
     }

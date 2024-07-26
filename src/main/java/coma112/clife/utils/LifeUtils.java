@@ -156,7 +156,7 @@ public class LifeUtils {
             }
         }
 
-        return !getBlockedBlocks().contains(above.getType());
+        return above.getType() == Material.AIR;
     }
 
     public static void loadBlockedBlocks() {

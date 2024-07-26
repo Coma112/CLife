@@ -23,16 +23,6 @@ public class DatabaseListener implements Listener {
 
         CLife.getDatabase().createPlayer(player);
 
-        Bukkit.getOnlinePlayers().forEach(other -> {
-            if (player.getWorld() != other.getWorld()) {
-                player.hidePlayer(CLife.getInstance(), other);
-                other.hidePlayer(CLife.getInstance(), player);
-            } else {
-                player.showPlayer(CLife.getInstance(), other);
-                other.showPlayer(CLife.getInstance(), player);
-            }
-        });
-
         if (CLife.getInstance().getConfiguration().getYml().get("lobby") == null) {
             player.sendMessage(MessageKeys.NO_LOBBY.getMessage());
             return;
@@ -53,5 +43,15 @@ public class DatabaseListener implements Listener {
         player.setAllowFlight(false);
         player.setGameMode(GameMode.SURVIVAL);
         for (PotionEffect effects : player.getActivePotionEffects()) player.removePotionEffect(effects.getType());
-        }
+
+        Bukkit.getOnlinePlayers().forEach(other -> {
+            if (player.getWorld() != other.getWorld()) {
+                player.hidePlayer(CLife.getInstance(), other);
+                other.hidePlayer(CLife.getInstance(), player);
+            } else {
+                player.showPlayer(CLife.getInstance(), other);
+                other.showPlayer(CLife.getInstance(), player);
+            }
+        });
+    }
 }

@@ -111,7 +111,7 @@ public class CommandLife {
 
                 player.sendMessage(MessageKeys.SUCCESSFUL_REMOVE_PLAYER
                         .getMessage()
-                        .replace("{target}", player.getName())
+                        .replace("{target}", target.getName())
                         .replace("{time}", LifeUtils.formatTime(time)));
             }
         }
@@ -160,6 +160,7 @@ public class CommandLife {
         world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
         world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, false);
         world.setGameRule(GameRule.DO_INSOMNIA, false);
+        world.setGameRule(GameRule.NATURAL_REGENERATION, false);
         world.setTime(6000);
         world.setStorm(false);
         world.setThundering(false);
