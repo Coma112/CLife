@@ -104,10 +104,7 @@ public class DamageListener implements Listener {
         Player player = event.getEntity();
         Match match = Match.getMatchById(player.getLocation().getWorld().getName());
 
-        if (match != null) {
-            player.spigot().respawn();
-            player.teleport(player.getWorld().getSpawnLocation());
-        }
+        if (match != null) player.teleport(player.getWorld().getSpawnLocation());
     }
 
     @EventHandler

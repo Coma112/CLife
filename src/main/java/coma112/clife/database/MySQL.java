@@ -3,8 +3,12 @@ package coma112.clife.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import coma112.clife.CLife;
+import coma112.clife.managers.stats.DeathStatistics;
+import coma112.clife.managers.stats.KillStatistics;
+import coma112.clife.managers.stats.WinsStatistics;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -325,5 +329,122 @@ public class MySQL extends AbstractDatabase {
         }
 
         return worlds;
+    }
+
+    @Override
+    public int getKillStatistics(int number) {
+        String query = "SELECT KILLS FROM life ORDER BY KILSS DESC LIMIT ?, 1";
+
+        try {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setInt(1, number - 1);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) return resultSet.getInt("KILLS");
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return 0;
+    }
+
+    @Override
+    public String getTopKillsPlayer(int top) {
+        String playerName = null;
+        String query = "SELECT PLAYER FROM life ORDER BY KILLS DESC LIMIT ?, 1";
+
+        try {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setInt(1, top - 1);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) playerName = resultSet.getString("PLAYER");
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return playerName;
+    }
+
+    @Override
+    public int getDeathStatistics(int number) {
+        String query = "SELECT DEATHS FROM life ORDER BY DEATHS DESC LIMIT ?, 1";
+
+        try {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setInt(1, number - 1);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) return resultSet.getInt("DEATHS");
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return 0;
+    }
+
+    @Override
+    public String getTopDeathsPlayer(int top) {
+        String playerName = null;
+        String query = "SELECT PLAYER FROM life ORDER BY DEATHS DESC LIMIT ?, 1";
+
+        try {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setInt(1, top - 1);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) playerName = resultSet.getString("PLAYER");
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return playerName;
+    }
+
+    @Override
+    public int getWinStatistics(int number) {
+        String query = "SELECT WINS FROM life ORDER BY WINS DESC LIMIT ?, 1";
+
+        try {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setInt(1, number - 1);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) return resultSet.getInt("WINS");
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return 0;
+    }
+
+    @Override
+    public String getTopWinsPlayer(int top) {
+        String playerName = null;
+        String query = "SELECT PLAYER FROM life ORDER BY WINS DESC LIMIT ?, 1";
+
+        try {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
+                preparedStatement.setInt(1, top - 1);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) playerName = resultSet.getString("PLAYER");
+            }
+        } catch (SQLException exception) {
+            LifeLogger.error(exception.getMessage());
+        }
+
+        return playerName;
     }
 }

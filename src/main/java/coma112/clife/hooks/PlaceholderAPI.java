@@ -38,6 +38,62 @@ public class PlaceholderAPI extends PlaceholderExpansion {
     public String onPlaceholderRequest(@NotNull Player player, @NotNull String params) {
         Match match = CLife.getInstance().getMatch(player);
 
+        if (params.startsWith("topkillsplayer_")) {
+            try {
+                int position = Integer.parseInt(params.split("_")[1]);
+
+                if (CLife.getDatabase().getTopKillsPlayer(position) != null) return CLife.getDatabase().getTopKillsPlayer(position);
+                return "---";
+            } catch (Exception exception) {
+                return "";
+            }
+        } else if (params.startsWith("topkills_")) {
+            try {
+                int position = Integer.parseInt(params.split("_")[1]);
+
+                if (CLife.getDatabase().getKillStatistics(position) != 0) return String.valueOf(CLife.getDatabase().getKillStatistics(position));
+                return "---";
+            } catch (Exception exception) {
+                return "";
+            }
+        } else if (params.startsWith("topdeathsplayer_")) {
+            try {
+                int position = Integer.parseInt(params.split("_")[1]);
+
+                if (CLife.getDatabase().getTopDeathsPlayer(position) != null) return CLife.getDatabase().getTopDeathsPlayer(position);
+                return "---";
+            } catch (Exception exception) {
+                return "";
+            }
+        } else if (params.startsWith("topdeaths_")) {
+            try {
+                int position = Integer.parseInt(params.split("_")[1]);
+
+                if (CLife.getDatabase().getDeathStatistics(position) != 0) return String.valueOf(CLife.getDatabase().getDeathStatistics(position));
+                return "---";
+            } catch (Exception exception) {
+                return "";
+            }
+        } else if (params.startsWith("topwinsplayer_")) {
+            try {
+                int position = Integer.parseInt(params.split("_")[1]);
+
+                if (CLife.getDatabase().getTopWinsPlayer(position) != null) return CLife.getDatabase().getTopWinsPlayer(position);
+                return "---";
+            } catch (Exception exception) {
+                return "";
+            }
+        } else if (params.startsWith("topwins_")) {
+            try {
+                int position = Integer.parseInt(params.split("_")[1]);
+
+                if (CLife.getDatabase().getWinStatistics(position) != 0) return String.valueOf(CLife.getDatabase().getWinStatistics(position));
+                return "---";
+            } catch (Exception exception) {
+                return "";
+            }
+        }
+
         return switch (params) {
             case "color_string" -> {
                 if (match == null) yield "";

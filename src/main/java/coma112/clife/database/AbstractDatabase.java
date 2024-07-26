@@ -1,5 +1,8 @@
 package coma112.clife.database;
 
+import coma112.clife.managers.stats.DeathStatistics;
+import coma112.clife.managers.stats.KillStatistics;
+import coma112.clife.managers.stats.WinsStatistics;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -40,4 +43,16 @@ public abstract class AbstractDatabase {
     public abstract boolean isIDExists(@NotNull String worldID);
 
     public abstract List<String> getWorlds();
+
+    public abstract int getKillStatistics(int number);
+
+    public abstract int getDeathStatistics(int number);
+
+    public abstract String getTopKillsPlayer(int top);
+
+    public abstract int getWinStatistics(int number);
+
+    public abstract String getTopDeathsPlayer(int top);
+
+    public abstract String getTopWinsPlayer(int top);
 }
