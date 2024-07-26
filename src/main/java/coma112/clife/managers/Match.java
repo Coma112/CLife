@@ -135,8 +135,6 @@ public class Match {
         getLastAttacker().clear();
         CLife.getInstance().getServer().getPluginManager().callEvent(new MatchEndEvent(Match.this));
         winner = null;
-
-        Bukkit.getOnlinePlayers().forEach(this::showAllPlayers);
     }
 
 
@@ -224,7 +222,6 @@ public class Match {
         countdown = ConfigKeys.COUNTDOWN.getInt();
 
         getStartingPlayers().addAll(getPlayers());
-        getPlayers().forEach(this::hideOtherPlayers);
 
         if (ConfigKeys.RTP_ENABLED.getBoolean()) randomTeleport();
         if (ConfigKeys.CHEST_ENABLED.getBoolean()) placeChests();
@@ -420,40 +417,6 @@ public class Match {
                 }
             } else {
                 LifeLogger.warn("No safe location found for player " + player.getName());
-            }
-        });
-    }
-
-    private void hideOtherPlayers(@NotNull Player player) {
-        World matchWorld = Bukkit.getWorld(getId());
-        Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
-            if (otherPlayer.getWorld().equals(matchWorld)) {
-                if (player.canSee(otherPlayer)) {
-                    player.hidePlayer(CLife.getInstance(), otherPlayer);
-                    System.out.println("Hiding " + otherPlayer.getName() + " from " + player.getName());
-                }
-            } else {
-                if (player.canSee(otherPlayer)) {
-                    player.hidePlayer(CLife.getInstance(), otherPlayer);
-                    System.out.println("Hiding " + otherPlayer.getName() + " from " + player.getName());
-                }
-            }
-        });
-    }
-
-    private void showAllPlayers(@NotNull Player player) {
-        World matchWorld = Bukkit.getWorld(getId());
-        Bukkit.getOnlinePlayers().forEach(otherPlayer -> {
-            if (otherPlayer.getWorld().equals(matchWorld)) {
-                if (!player.canSee(otherPlayer)) {
-                    player.showPlayer(CLife.getInstance(), otherPlayer);
-                    System.out.println("Showing " + otherPlayer.getName() + " to " + player.getName());
-                }
-            } else {
-                if (player.canSee(otherPlayer)) {
-                    player.showPlayer(CLife.getInstance(), otherPlayer);
-                    System.out.println("Showing " + otherPlayer.getName() + " to " + player.getName());
-                }
             }
         });
     }

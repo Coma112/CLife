@@ -140,7 +140,6 @@ public class LifeUtils {
         int z = location.getBlockZ();
         int y = world.getHighestBlockYAt(x, z);
 
-
         Block block = world.getBlockAt(x, y, z);
         Block below = world.getBlockAt(x, y - 1, z);
         Block above = world.getBlockAt(x, y + 1, z);
@@ -157,7 +156,7 @@ public class LifeUtils {
             }
         }
 
-        return above.getType() == Material.AIR;
+        return !getBlockedBlocks().contains(above.getType());
     }
 
     public static void loadBlockedBlocks() {

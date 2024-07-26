@@ -41,6 +41,7 @@ public class RegisterUtils {
         listenerClasses.add(MatchKillListener.class);
         listenerClasses.add(DatabaseListener.class);
         listenerClasses.add(SpectatorListener.class);
+        listenerClasses.add(WorldListener.class);
         listenerClasses.add(MovementListener.class);
         return listenerClasses;
     }

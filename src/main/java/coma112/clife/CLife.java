@@ -42,6 +42,7 @@ public final class CLife extends JavaPlugin {
     public void onLoad() {
         instance = this;
         scheduler = UniversalScheduler.getScheduler(this);
+        core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
     }
 
     @Override
@@ -56,8 +57,6 @@ public final class CLife extends JavaPlugin {
         PlaceholderAPI.registerHook();
 
         new Metrics(this, 22532);
-
-        core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
     }
 
     @Override
