@@ -33,7 +33,10 @@ public class DatabaseListener implements Listener {
             }
         });
 
-        if (CLife.getInstance().getConfiguration().getYml().get("lobby") == null) player.sendMessage(MessageKeys.NO_LOBBY.getMessage());
+        if (CLife.getInstance().getConfiguration().getYml().get("lobby") == null) {
+            player.sendMessage(MessageKeys.NO_LOBBY.getMessage());
+            return;
+        }
 
         Location location = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby"));
 
