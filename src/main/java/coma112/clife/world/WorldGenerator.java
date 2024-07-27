@@ -1,6 +1,7 @@
 package coma112.clife.world;
 
 import coma112.clife.CLife;
+import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.utils.LifeUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -24,6 +25,8 @@ public class WorldGenerator {
         String uniqueID = LifeUtils.generateUniqueID();
         WorldCreator creator = new WorldCreator(uniqueID);
         generatedWorld = Bukkit.createWorld(creator);
+
+        LifeUtils.setWorldBorder(generatedWorld.getSpawnLocation(), ConfigKeys.RADIUS.getInt());
 
         CLife.getDatabase().saveWorldID(uniqueID);
 
