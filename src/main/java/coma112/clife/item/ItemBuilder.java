@@ -17,7 +17,7 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ItemBuilder implements IItemBuilder {
     private final ItemStack is;
-    private final ItemMeta meta;
+    private ItemMeta meta;
     private boolean finished = false;
 
     public ItemBuilder(@NotNull ItemStack item) {
@@ -97,6 +97,13 @@ public class ItemBuilder implements IItemBuilder {
         lores.remove(Math.min(line, lores.size()));
 
         meta.setLore(lores);
+
+        return this;
+    }
+
+    @Override
+    public ItemBuilder setMeta(@NotNull ItemMeta meta) {
+        this.meta = meta;
 
         return this;
     }

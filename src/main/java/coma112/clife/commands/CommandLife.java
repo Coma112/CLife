@@ -61,7 +61,6 @@ public class CommandLife {
             return;
         }
 
-
         match.endMatch();
     }
 
@@ -104,6 +103,7 @@ public class CommandLife {
             }
             case "-" -> {
                 match.removeTime(target, time);
+                match.recordAttack(player, target, time);
                 target.sendMessage(MessageKeys.SUCCESSFUL_REMOVE_TARGET
                         .getMessage()
                         .replace("{player}", player.getName())

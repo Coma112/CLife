@@ -2,35 +2,38 @@ package coma112.clife.listeners;
 
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.MessageKeys;
+import coma112.clife.managers.Match;
+import coma112.clife.services.ScoreboardService;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import java.util.Objects;
 
 public class DatabaseListener implements Listener {
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onJoin(final PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         CLife.getDatabase().createPlayer(player);
 
-        if (CLife.getInstance().getConfiguration().getYml().get("lobby") == null) {
+        Location location = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby"));
+
+        if (location == null || location.getWorld() == null) {
             player.sendMessage(MessageKeys.NO_LOBBY.getMessage());
             return;
         }
 
-        Location location = LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby"));
-
-        player.teleport(Objects.requireNonNull(location));
+        player.teleport(location);
         player.setVelocity(new Vector(0, 0, 0));
         player.getInventory().clear();
         player.getInventory().setArmorContents(new ItemStack[0]);
@@ -53,5 +56,15 @@ public class DatabaseListener implements Listener {
                 other.showPlayer(CLife.getInstance(), player);
             }
         });
+    }
+
+    @EventHandler
+    public void onQuit(final PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        Match match = CLife.getInstance().getMatch(player);
+
+        if (match == null) return;
+
+        match.removePlayer(player);
     }
 }

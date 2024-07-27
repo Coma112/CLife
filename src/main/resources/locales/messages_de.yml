@@ -37,3 +37,6 @@ messages:
   successful-add-time-target: "&a&lLIFE &8| &2{player} &ahat &2{time} &a-Zeit zu dir hinzugefügt!"
   successful-remove-time-player: "&a&lLIFE &8| &aDu hast erfolgreich &2{time} &a-Zeit von &2{target}&a entfernt!"
   successful-remove-time-target: "&a&lLIFE &8| &7{player} &chat &7{time} &c-Zeit von dir entfernt!"
+  first-page: "&a&lLIFE &8| &cDu bist bereits auf der ersten Seite!"
+  last-page: "&a&lLIFE &8| &cDu bist bereits auf der letzten Seite!"
+

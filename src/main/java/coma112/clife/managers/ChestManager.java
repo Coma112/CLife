@@ -18,13 +18,12 @@ public class ChestManager {
 
     public static void generateLoot(@NotNull Inventory chestInventory, @NotNull String chestPath) {
         ConfigurationSection chestLootSection = CLife.getInstance().getConfiguration().getSection(chestPath);
+        List<ItemStack> potentialLoot = new ArrayList<>();
 
         if (chestLootSection == null) {
             LifeLogger.warn("Chest loot section is null.");
             return;
         }
-
-        List<ItemStack> potentialLoot = new ArrayList<>();
 
         for (String key : chestLootSection.getKeys(false)) {
             ConfigurationSection itemSection = chestLootSection.getConfigurationSection(key);

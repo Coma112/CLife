@@ -9,6 +9,7 @@ import coma112.clife.events.MatchEndEvent;
 import coma112.clife.events.MatchKillEvent;
 import coma112.clife.events.MatchSpectatorEvent;
 import coma112.clife.events.MatchStartEvent;
+import coma112.clife.services.ScoreboardService;
 import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
 import coma112.clife.world.WorldGenerator;
@@ -106,6 +107,7 @@ public class Match {
                 player.setGameMode(GameMode.SURVIVAL);
                 CLife.getInstance().getColorManager().removeColor(player);
                 playerIterator.remove();
+                ScoreboardService.removeMatchBoard(player);
             }
         }
 
@@ -119,6 +121,7 @@ public class Match {
                 player.setGameMode(GameMode.SURVIVAL);
                 CLife.getInstance().getColorManager().removeColor(player);
                 spectatorIterator.remove();
+                ScoreboardService.removeMatchBoard(player);
             }
         }
 
@@ -142,6 +145,9 @@ public class Match {
         player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
         player.getInventory().clear();
         player.setGameMode(GameMode.SURVIVAL);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        ScoreboardService.removeMatchBoard(player);
     }
 
     public boolean isInMatch(@NotNull Player player) {
@@ -252,6 +258,7 @@ public class Match {
                 startPlayerCountdown();
                 getStartingPlayers().clear();
                 CLife.getInstance().getServer().getPluginManager().callEvent(new MatchStartEvent(Match.this));
+                getPlayers().forEach(ScoreboardService::giveMatchBoard);
             }
         }, 0L, 20L);
     }

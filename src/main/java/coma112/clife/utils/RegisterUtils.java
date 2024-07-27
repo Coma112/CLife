@@ -6,6 +6,7 @@ import coma112.clife.listeners.*;
 import coma112.clife.listeners.webhook.MatchEndListener;
 import coma112.clife.listeners.webhook.MatchKillListener;
 import coma112.clife.listeners.webhook.MatchStartListener;
+import coma112.clife.menu.MenuListener;
 import org.bukkit.event.Listener;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
@@ -43,6 +44,7 @@ public class RegisterUtils {
         listenerClasses.add(SpectatorListener.class);
         listenerClasses.add(WorldListener.class);
         listenerClasses.add(MovementListener.class);
+        listenerClasses.add(MenuListener.class);
         return listenerClasses;
     }
 }

@@ -18,14 +18,19 @@ end:
   subtitle: "&e&lTHE WINNER IS &6{winner}"
   broadcast: "&6{winner} &ahas won the match! &2GG!"
 
+# The match's radius.
 world-radius: 15
 
+# Queue configuration.
 queue:
   maxplayer: 2
   action-bar: "&a{queueSize} &7/ &a{queueMax}"
 
+# These items will get when a player die.
+
 spectator:
   leave-item:
+    slot: 8
     amount: 1
     material: BARRIER
     name: "&c&lLEAVE MATCH"
@@ -33,6 +38,7 @@ spectator:
       - ""
       - "&7Click with this item to leave the match."
   playerfinder-item:
+    slot: 1
     amount: 1
     material: COMPASS
     name: "&a&lALIVE PLAYERS"
@@ -194,3 +200,37 @@ blocked-blocks:
   - "DARK_OAK_LEAVES"
   - "AZALEA_LEAVES"
   - "FLOWERING_AZALEA_LEAVES"
+
+# This is the menu when the spectators get when they die.
+
+menu:
+  title: "&a&lALIVE PLAYERS."
+  size: 54 # Max size is 54.
+  update-tick: 2 # In second.
+  back-item:
+    amount: 1
+    material: "RED_STAINED_GLASS"
+    name: "&cBack"
+    slot: 45
+  forward-item:
+    amount: 1
+    material: "GREEN_STAINED_GLASS"
+    name: "&aForward"
+    slot: 53
+
+# Scoreboard
+
+scoreboards:
+  match-scoreboard:
+    title: "&a&lᴄʟɪꜰᴇ"
+    lines:
+      - "    &7◆&m                                  &r&7◆    "
+      - ""
+      - "            &2&lᴍᴀᴛᴄʜ ɪɴꜰᴏ"
+      - ""
+      - "              &7 ▪ &aᴄᴏʟᴏʀ: &2%cl_color_string%"
+      - "              &7 ▪ &aᴛɪᴍᴇ ʟᴇꜰᴛ: %cl_color_code%%cl_time%"
+      - "              &7 ▪ &aᴀʟɪᴠᴇ ᴘʟᴀʏᴇʀꜱ: &2%cl_alive_players%"
+      - ""
+      - "    &7◆&m                                  &r&7◆    "
+      - "             &aᴘʟᴀʏ.ᴄʟɪꜰᴇ.ᴄᴏᴍ &7| &a%cl_match_id%      "

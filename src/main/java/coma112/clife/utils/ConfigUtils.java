@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,6 +90,13 @@ public class ConfigUtils {
 
     public void setName(@NotNull String name) {
         this.name = name;
+    }
+
+    public String[] getStrings(@NotNull String path) {
+        return yml.getStringList(path)
+                .stream()
+                .map(MessageProcessor::process)
+                .toArray(String[]::new);
     }
 }
 

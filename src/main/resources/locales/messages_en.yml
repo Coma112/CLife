@@ -34,3 +34,5 @@ messages:
   successful-add-time-target: "&a&lLIFE &8| &2{player} &aadded &2{time} &ato your time!"
   successful-remove-time-player: "&a&lLIFE &8| &aYou have successfully taken &2{time} &afrom &2{target}&a's time!"
   successful-remove-time-target: "&a&lLIFE &8| &7{player} &ctook &7{time} &cfrom you!"
+  first-page: "&a&lLIFE &8| &cYou are already on the first page!"
+  last-page: "&a&lLIFE &8| &cYou are already on the last page!"

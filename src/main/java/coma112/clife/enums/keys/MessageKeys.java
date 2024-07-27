@@ -31,6 +31,8 @@ public enum MessageKeys {
     SUCCESSFUL_REMOVE_PLAYER("messages.successful-remove-time-player"),
     SUCCESSFUL_REMOVE_TARGET("messages.successful-remove-time-target"),
     SUCCESSFUL_STOPALL("messages.successful-stopall"),
+    FIRST_PAGE("messages.last-page"),
+    LAST_PAGE("messages.first-page"),
     NOT_ENOUGH_PLAYERS("messages.not-enough-players");
 
     private final String path;
@@ -49,5 +51,4 @@ public enum MessageKeys {
                 .map(MessageProcessor::process)
                 .toList();
     }
-
 }

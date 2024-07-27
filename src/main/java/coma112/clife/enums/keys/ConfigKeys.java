@@ -2,8 +2,12 @@ package coma112.clife.enums.keys;
 
 import coma112.clife.CLife;
 import coma112.clife.processor.MessageProcessor;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public enum ConfigKeys {
     LANGUAGE("language"),
@@ -36,10 +40,21 @@ public enum ConfigKeys {
     REGENERATION_POTION("potions.regeneration"),
     STARTING_TIME("time"),
     QUEUE_ACTIONBAR("queue.action-bar"),
+    MENU_TICK("menu.update-tick"),
+    MENU_SIZE("menu.size"),
+    MENU_TITLE("menu.title"),
+    BACK_ITEM_SLOT("menu.back-item.slot"),
+    FORWARD_ITEM_SLOT("menu.forward-item.slot"),
 
     COLOR_BROADCAST("color.broadcast"),
     COLOR_PLAYER_TITLE("color.player-title"),
     COLOR_PLAYER_SUBTITLE("color.player-subtitle"),
+
+    LEAVE_ITEM_SLOT("spectator.leave-item.slot"),
+    PLAYERFINDER_ITEM_SLOT("spectator.playerfinder-item.slot"),
+
+    MATCH_SCOREBOARD_TITLE("scoreboards.match-scoreboard.title"),
+    MATCH_SCOREBOARD_LINES("scoreboards.match-scoreboard.lines"),
 
     DEATH_VICTIM_TITLE("death.victim-title"),
     DEATH_VICTIM_SUBTITLE("death.victim-subtitle"),
@@ -109,11 +124,7 @@ public enum ConfigKeys {
         return CLife.getInstance().getConfiguration().getInt(path);
     }
 
-    public Location getLocation() {
-        return CLife.getInstance().getConfiguration().getYml().getLocation(path);
-    }
-
-    public double getDouble() {
-        return CLife.getInstance().getConfiguration().getYml().getDouble(path);
+    public List<String> getScoreboardList(@NotNull Player player) {
+        return MessageProcessor.processList(PlaceholderAPI.setPlaceholders(player, CLife.getInstance().getConfiguration().getList(path)));
     }
 }

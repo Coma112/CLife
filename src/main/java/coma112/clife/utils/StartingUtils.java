@@ -1,6 +1,5 @@
 package coma112.clife.utils;
 
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import coma112.clife.CLife;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -21,8 +20,8 @@ public class StartingUtils {
     }
 
     public static void deleteWorlds() {
-        List<String> worldsOnServer = CLife.getCore().getMVWorldManager().getMVWorlds().stream()
-                .map(MultiverseWorld::getName)
+        List<String> worldsOnServer = Bukkit.getWorlds().stream()
+                .map(World::getName)
                 .toList();
 
         CLife.getDatabase().getWorlds().forEach(worldID -> {

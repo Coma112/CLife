@@ -37,3 +37,6 @@ messages:
   successful-add-time-target: "&a&lLIFE &8| &2{player} &a-hozzáadott &2{time} &a-időt neked!"
   successful-remove-time-player: "&a&lLIFE &8| &aSikeresen elvettél &2{time} &a-időt &2{target}&a-tól!"
   successful-remove-time-target: "&a&lLIFE &8| &7{player} &c-elvett tőled &7{time} &c-időt!"
+  first-page: "&a&lLIFE &8| &cMár az első oldalon vagy!"
+  last-page: "&a&lLIFE &8| &cMár az utolsó oldalon vagy!"
+

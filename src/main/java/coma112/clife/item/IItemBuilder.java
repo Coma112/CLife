@@ -1,12 +1,14 @@
 package coma112.clife.item;
 
 import coma112.clife.CLife;
+import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.processor.MessageProcessor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -67,6 +69,8 @@ public interface IItemBuilder {
 
     IItemBuilder removeLore(int line);
 
+    ItemBuilder setMeta(@NotNull ItemMeta meta);
+
     ItemStack finish();
 
     boolean isFinished();
@@ -83,6 +87,10 @@ public interface IItemBuilder {
                 .setName(Objects.requireNonNull(name))
                 .addLore(loreArray)
                 .finish();
+    }
+
+    static ItemStack createItemFromString(@NotNull String string) {
+        return createItemFromSection(Objects.requireNonNull(CLife.getInstance().getConfiguration().getSection(string)));
     }
 }
 

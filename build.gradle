@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'coma112'
-version = '1.0.9'
+version = '1.1.0'
 
 repositories {
     mavenCentral()
@@ -20,7 +20,6 @@ repositories {
 
     maven { url 'https://jitpack.io' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
-    maven { url = "https://repo.onarandombox.com/content/groups/public/" }
 }
 
 dependencies {
@@ -33,7 +32,7 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.bstats:bstats-bukkit:3.0.2'
     implementation 'com.github.Anon8281:UniversalScheduler:0.1.6'
-    compileOnly 'com.onarandombox.multiversecore:Multiverse-Core:4.3.1'
+    implementation 'fr.mrmicky:fastboard:2.1.3'
 }
 
 java {
@@ -49,6 +48,7 @@ compileJava {
 shadowJar {
     relocate 'org.bstats', 'coma112.clife'
     relocate 'com.github.Anon8281.universalScheduler', 'coma112.clife'
+    relocate 'fr.mrmicky.fastboard', 'coma112.clife'
     minimize()
 }
 
