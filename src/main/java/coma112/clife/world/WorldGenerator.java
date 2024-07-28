@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
+import java.util.Objects;
+
 
 @Getter
 public class WorldGenerator {
@@ -26,7 +28,7 @@ public class WorldGenerator {
         WorldCreator creator = new WorldCreator(uniqueID);
         generatedWorld = Bukkit.createWorld(creator);
 
-        LifeUtils.setWorldBorder(generatedWorld.getSpawnLocation(), ConfigKeys.RADIUS.getInt());
+        LifeUtils.setWorldBorder(Objects.requireNonNull(generatedWorld).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
 
         CLife.getDatabase().saveWorldID(uniqueID);
 

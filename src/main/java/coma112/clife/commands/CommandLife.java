@@ -102,7 +102,6 @@ public class CommandLife {
                         .replace("{time}", LifeUtils.formatTime(time)));
             }
             case "-" -> {
-                match.removeTime(target, time);
                 match.recordAttack(player, target, time);
                 target.sendMessage(MessageKeys.SUCCESSFUL_REMOVE_TARGET
                         .getMessage()

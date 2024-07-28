@@ -360,7 +360,7 @@ public class Match {
         }
 
         updatePlayerColor();
-        checkForWinner();
+        if (getPlayers().stream().filter(player -> getPlayerTimes().getOrDefault(player, 0) > 0).count() <= 1) checkForWinner();
     }
 
     private void setupMatchWorld(@NotNull World world) {

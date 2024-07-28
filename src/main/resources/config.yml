@@ -38,7 +38,7 @@ spectator:
       - ""
       - "&7Click with this item to leave the match."
   playerfinder-item:
-    slot: 1
+    slot: 0
     amount: 1
     material: COMPASS
     name: "&a&lALIVE PLAYERS"

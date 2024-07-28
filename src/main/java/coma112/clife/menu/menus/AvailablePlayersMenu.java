@@ -3,8 +3,6 @@ package coma112.clife.menu.menus;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
-import coma112.clife.item.IItemBuilder;
-import coma112.clife.item.ItemBuilder;
 import coma112.clife.managers.Match;
 import coma112.clife.menu.PaginatedMenu;
 import coma112.clife.processor.MessageProcessor;
