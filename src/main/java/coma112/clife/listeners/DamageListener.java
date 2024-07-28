@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class DamageListener implements Listener {
     @EventHandler
@@ -75,11 +76,11 @@ public class DamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDeath(final PlayerDeathEvent event) {
-        Player player = event.getEntity();
+    public void onRespawn(final PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
         Match match = Match.getMatchById(player.getLocation().getWorld().getName());
 
-        if (match != null) player.teleport(player.getWorld().getSpawnLocation());
+        if (match != null) CLife.getInstance().getScheduler().runTaskLater(() -> player.teleport(player.getWorld().getSpawnLocation()), 1);
     }
 
     @EventHandler

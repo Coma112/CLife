@@ -9,9 +9,15 @@ import coma112.clife.processor.MessageProcessor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.dimension.DimensionType;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -204,7 +210,6 @@ public class LifeUtils {
             deleteRecursively(worldFolder);
         });
     }
-
 
     private static void deleteRecursively(@NotNull File file) {
         if (file.isDirectory()) {

@@ -55,9 +55,10 @@ public class Queue {
     }
 
     public static void processQueue() {
+        World world = WorldGenerator.generateWorld();
+
         CLife.getInstance().getScheduler().runTaskLater(() -> {
             List<Player> playersToProcess;
-            World world = WorldGenerator.generateWorld();
 
             synchronized (getQueue()) {
                 if (getQueue().size() < ConfigKeys.QUEUE_MAX.getInt()) return;

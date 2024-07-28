@@ -206,6 +206,7 @@ public class Match {
 
     private void startPlayerCountdown() {
         setStatus(GameState.PLAYING);
+        LifeUtils.setWorldBorder(Objects.requireNonNull(Bukkit.getWorld(getId())).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
 
         CLife.getInstance().getScheduler().runTaskTimer(() -> {
             synchronized (getPlayerTimes()) {

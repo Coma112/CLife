@@ -4,14 +4,13 @@ import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.utils.LifeUtils;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-
-import java.util.Objects;
-
+import net.kyori.adventure.util.TriState;
+import org.bukkit.*;
+import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.scheduler.BukkitRunnable;
 
 @Getter
+@SuppressWarnings("deprecation")
 public class WorldGenerator {
     private static boolean generated = false;
     private static World generatedWorld;
@@ -25,14 +24,32 @@ public class WorldGenerator {
         if (generated) return generatedWorld;
 
         String uniqueID = LifeUtils.generateUniqueID();
+
+
         WorldCreator creator = new WorldCreator(uniqueID);
+
         generatedWorld = Bukkit.createWorld(creator);
 
-        LifeUtils.setWorldBorder(Objects.requireNonNull(generatedWorld).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
+        Location spawnLocation = new Location(generatedWorld, 0, 70, 0);
+        ChunkGenerator generator = new FixedSpawnChunkGenerator(spawnLocation);
 
-        CLife.getDatabase().saveWorldID(uniqueID);
+        creator.environment(World.Environment.NORMAL);
+        creator.type(WorldType.NORMAL);
+        creator.generator(generator);
+        creator.keepSpawnLoaded(TriState.byBoolean(false));
 
-        if (generatedWorld != null) generated = true;
+
+        if (generatedWorld != null) {
+            generatedWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+            generatedWorld.setKeepSpawnInMemory(false);
+            generatedWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
+            generatedWorld.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
+
+                generatedWorld.getChunkAt(spawnLocation).load();
+                CLife.getDatabase().saveWorldID(uniqueID);
+                generated = true;
+        }
+
         return generatedWorld;
     }
 }
