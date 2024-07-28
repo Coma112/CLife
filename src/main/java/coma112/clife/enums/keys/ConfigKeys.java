@@ -3,42 +3,55 @@ package coma112.clife.enums.keys;
 import coma112.clife.CLife;
 import coma112.clife.processor.MessageProcessor;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public enum ConfigKeys {
+    // Language and Database
     LANGUAGE("language"),
     DATABASE("database.type"),
+
+    // Colors
     COLOR_RED("color-name.red"),
     COLOR_LIME("color-name.lime"),
     COLOR_DARK_GREEN("color-name.dark-green"),
     COLOR_YELLOW("color-name.yellow"),
     COLOR_ORANGE("color-name.orange"),
     COLOR_VIOLET("color-name.violet"),
+    COLOR_BROADCAST("color.broadcast"),
+    COLOR_PLAYER_TITLE("color.player-title"),
+    COLOR_PLAYER_SUBTITLE("color.player-subtitle"),
+
+    // Countdown and Timing
     COUNTDOWN("countdown.time"),
-    MINIMUM_PLAYERS("minimum-players"),
     COUNTDOWN_TITLE("countdown.title"),
+    COUNTDOWN_SUBTITLE("countdown.subtitle"),
+    STARTING_TIME("time"),
+    ENCHANTED_GOLDEN_APPLE_TIME("egapple-time"),
+    GOLDEN_APPLE_TIME("gapple-time"),
+
+    // Players and Damage
+    MINIMUM_PLAYERS("minimum-players"),
     DAMAGE("damage-per-half-heart"),
+    KILLER_DAMAGE("add-time-per-half-heart"),
+    EVERYONE_CAN_ATTACK("everyone-can-attack"),
+
+    // Game Settings
     RTP_ENABLED("rtp-enabled"),
     CHEST_ENABLED("chest-enabled"),
     CHEST_COUNT("chest-in-area"),
     LOOT_IN_ONE_CHEST("loot-in-one-chest"),
-    KILLER_DAMAGE("add-time-per-half-heart"),
     ALWAYS_DAY("always-day"),
-    EVERYONE_CAN_ATTACK("everyone-can-attack"),
+
+    // End Game
     END_TITLE("end.title"),
     END_BROADCAST("end.broadcast"),
     END_SUBTITLE("end.subtitle"),
-    COUNTDOWN_SUBTITLE("countdown.subtitle"),
+
+    // Action Bars and Menus
     ACTION_BAR("action-bar"),
-    ENCHANTED_GOLDEN_APPLE_TIME("egapple-time"),
-    GOLDEN_APPLE_TIME("gapple-time"),
-    HEALING_POTION("potions.healing"),
-    REGENERATION_POTION("potions.regeneration"),
-    STARTING_TIME("time"),
     QUEUE_ACTIONBAR("queue.action-bar"),
     MENU_TICK("menu.update-tick"),
     MENU_SIZE("menu.size"),
@@ -46,26 +59,31 @@ public enum ConfigKeys {
     BACK_ITEM_SLOT("menu.back-item.slot"),
     FORWARD_ITEM_SLOT("menu.forward-item.slot"),
 
-    COLOR_BROADCAST("color.broadcast"),
-    COLOR_PLAYER_TITLE("color.player-title"),
-    COLOR_PLAYER_SUBTITLE("color.player-subtitle"),
-
+    // Spectator Items
     LEAVE_ITEM_SLOT("spectator.leave-item.slot"),
     PLAYERFINDER_ITEM_SLOT("spectator.playerfinder-item.slot"),
 
+    // Scoreboards
     MATCH_SCOREBOARD_TITLE("scoreboards.match-scoreboard.title"),
     MATCH_SCOREBOARD_LINES("scoreboards.match-scoreboard.lines"),
 
+    // Death Messages
     DEATH_VICTIM_TITLE("death.victim-title"),
     DEATH_VICTIM_SUBTITLE("death.victim-subtitle"),
     DEATH_BROADCAST_PLAYER("death.broadcast-player"),
     DEATH_BROADCAST_NOPLAYER("death.broadcast-noplayer"),
 
+    // World Settings
     RADIUS("world-radius"),
 
+    // Queue Settings
     QUEUE_MAX("queue.maxplayer"),
 
+    // Potions
+    HEALING_POTION("potions.healing"),
+    REGENERATION_POTION("potions.regeneration"),
 
+    // Webhooks for Match Start
     WEBHOOK_MATCH_START_EMBED_URL("webhook.match-start-embed.url"),
     WEBHOOK_MATCH_START_EMBED_ENABLED("webhook.match-start-embed.enabled"),
     WEBHOOK_MATCH_START_EMBED_TITLE("webhook.match-start-embed.title"),
@@ -79,6 +97,7 @@ public enum ConfigKeys {
     WEBHOOK_MATCH_START_EMBED_THUMBNAIL("webhook.match-start-embed.thumbnail"),
     WEBHOOK_MATCH_START_EMBED_IMAGE("webhook.match-start-embed.image"),
 
+    // Webhooks for Match End
     WEBHOOK_MATCH_END_EMBED_URL("webhook.match-end-embed.url"),
     WEBHOOK_MATCH_END_EMBED_ENABLED("webhook.match-end-embed.enabled"),
     WEBHOOK_MATCH_END_EMBED_TITLE("webhook.match-end-embed.title"),
@@ -92,6 +111,7 @@ public enum ConfigKeys {
     WEBHOOK_MATCH_END_EMBED_THUMBNAIL("webhook.match-end-embed.thumbnail"),
     WEBHOOK_MATCH_END_EMBED_IMAGE("webhook.match-end-embed.image"),
 
+    // Webhooks for Match Kill
     WEBHOOK_MATCH_KILL_EMBED_URL("webhook.match-kill-embed.url"),
     WEBHOOK_MATCH_KILL_EMBED_ENABLED("webhook.match-kill-embed.enabled"),
     WEBHOOK_MATCH_KILL_EMBED_TITLE("webhook.match-kill-embed.title"),
@@ -104,7 +124,6 @@ public enum ConfigKeys {
     WEBHOOK_MATCH_KILL_EMBED_FOOTER_ICON("webhook.match-kill-embed.footer-icon"),
     WEBHOOK_MATCH_KILL_EMBED_THUMBNAIL("webhook.match-kill-embed.thumbnail"),
     WEBHOOK_MATCH_KILL_EMBED_IMAGE("webhook.match-kill-embed.image");
-
 
     private final String path;
 
