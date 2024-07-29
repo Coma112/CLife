@@ -27,7 +27,7 @@ public class StartingUtils {
         CLife.getDatabase().getWorlds().forEach(worldID -> {
             if (!worldsOnServer.contains(worldID)) {
                 World world = Bukkit.getWorld(worldID);
-                if (world != null) LifeUtils.deleteWorld(world);
+                if (world != null) MatchUtils.deleteWorld(world);
                 else LifeLogger.error("World " + worldID + " does not exist on the server.");
             }
         });

@@ -3,7 +3,6 @@ package coma112.clife.managers;
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import coma112.clife.CLife;
 import coma112.clife.enums.Color;
-import coma112.clife.enums.GameState;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.events.MatchEndEvent;
 import coma112.clife.events.MatchKillEvent;
@@ -12,37 +11,37 @@ import coma112.clife.events.MatchStartEvent;
 import coma112.clife.services.ScoreboardService;
 import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.LifeUtils;
+import coma112.clife.utils.MatchUtils;
 import coma112.clife.world.WorldGenerator;
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
-
-
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Match {
     @Getter private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     @Getter private final List<Player> spectators = Collections.synchronizedList(new ArrayList<>());
     @Getter public static final List<Player> startingPlayers = Collections.synchronizedList(new ArrayList<>());
-    @Getter private static final List<Location> chestLocations = Collections.synchronizedList(new ArrayList<>());
-    @Getter private static final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
-    @Getter private static List<Material> blockedBlocks = Collections.synchronizedList(new ArrayList<>());
-    @Getter public static final List<Player> queue  = Collections.synchronizedList(new ArrayList<>());
+
+    @Getter
+    public static final List<Player> queue = Collections.synchronizedList(new ArrayList<>());
+    private static final List<Location> chestLocations = Collections.synchronizedList(new ArrayList<>());
+    private static final List<Player> availablePlayers = Collections.synchronizedList(new ArrayList<>());
+    private static final List<Material> blockedBlocks = Collections.synchronizedList(new ArrayList<>());
 
     @Getter public static final Map<String, String> defeatedPlayers = new ConcurrentHashMap<>();
     @Getter private static final Map<String, Match> activeMatchesById = new ConcurrentHashMap<>();
@@ -52,14 +51,11 @@ public class Match {
 
     @Getter private Player winner;
     @Getter private String id;
-    @Getter private int countdown;
+    @Getter
+    private int countdown = ConfigKeys.COUNTDOWN.getInt();
     @Getter private boolean matchEnded = false;
-    @Getter private GameState gameState;
 
     public Match(@NotNull World world) {
-        setStatus(GameState.WAITING);
-
-        CLife.getInstance().getScheduler().runTask(() -> {
 
             id = world.getName();
 
@@ -71,73 +67,13 @@ public class Match {
             startCountdown();
             startActionBarUpdate();
 
-            CLife.getActiveMatches().add(Match.this);
+        CLife.getInstance().getActiveMatches().add(Match.this);
             initializePlayers();
             getAvailablePlayers().clear();
-        });
     }
 
     public static Match getMatchById(@NotNull String id) {
         return getActiveMatchesById().get(id);
-    }
-
-    public void endMatch() {
-        World world = Bukkit.getWorld(id);
-        setStatus(GameState.RESTARTING);
-        if (matchEnded) return;
-        matchEnded = true;
-
-        synchronized (getChestLocations()) {
-            getChestLocations().stream()
-                    .filter(location -> location.getWorld().equals(Bukkit.getWorld(id)))
-                    .forEach(location -> {
-                        Block block = location.getBlock();
-                        if (block.getType() != Material.AIR) block.setType(Material.AIR);
-                    });
-            getChestLocations().removeIf(location -> location.getWorld().equals(Bukkit.getWorld(id)));
-        }
-
-        synchronized (getPlayers()) {
-            Iterator<Player> playerIterator = getPlayers().iterator();
-
-            while (playerIterator.hasNext()) {
-                Player player = playerIterator.next();
-                player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
-                player.getInventory().clear();
-                player.setGameMode(GameMode.SURVIVAL);
-                CLife.getInstance().getColorManager().removeColor(player);
-                playerIterator.remove();
-                ScoreboardService.removeMatchBoard(player);
-            }
-        }
-
-        synchronized (getSpectators()) {
-            Iterator<Player> spectatorIterator = getSpectators().iterator();
-
-            while (spectatorIterator.hasNext()) {
-                Player player = spectatorIterator.next();
-                player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
-                player.getInventory().clear();
-                player.setGameMode(GameMode.SURVIVAL);
-                CLife.getInstance().getColorManager().removeColor(player);
-                spectatorIterator.remove();
-                ScoreboardService.removeMatchBoard(player);
-            }
-        }
-
-        synchronized (getDefeatedPlayers()) {
-            getDefeatedPlayers().entrySet().removeIf(entry -> entry.getValue().equals(getId()));
-        }
-
-        LifeUtils.deleteWorld(world);
-        CLife.getActiveMatches().remove(this);
-        getActiveMatchesById().remove(getId());
-
-        getPlayerTimes().clear();
-        getAvailablePlayers().clear();
-        getLastAttacker().clear();
-        CLife.getInstance().getServer().getPluginManager().callEvent(new MatchEndEvent(Match.this));
-        winner = null;
     }
 
     public void removePlayer(@NotNull Player player) {
@@ -174,14 +110,6 @@ public class Match {
         return getPlayerTimes().getOrDefault(player, 0);
     }
 
-    public GameState getStatus() {
-        return gameState;
-    }
-
-    public void setStatus(@NotNull GameState gameState) {
-        this.gameState = gameState;
-    }
-
     public void recordAttack(@Nullable Player attacker, @NotNull Player victim, double finalDamage) {
         int victimTime = getTime(victim);
         int damageTime = (int) finalDamage;
@@ -198,6 +126,42 @@ public class Match {
         }
     }
 
+    public static List<Location> getChestLocations() {
+        return Collections.synchronizedList(chestLocations);
+    }
+
+    public static List<Player> getAvailablePlayers() {
+        return Collections.synchronizedList(availablePlayers);
+    }
+
+    public static List<Material> getBlockedBlocks() {
+        return Collections.synchronizedList(blockedBlocks);
+    }
+
+    public void endMatch() {
+        World world = Bukkit.getWorld(id);
+        if (matchEnded) return;
+        matchEnded = true;
+
+        clearChests();
+        teleportAndResetPlayers(getPlayers());
+        teleportAndResetPlayers(getSpectators());
+
+        synchronized (getDefeatedPlayers()) {
+            getDefeatedPlayers().entrySet().removeIf(entry -> entry.getValue().equals(getId()));
+        }
+
+        MatchUtils.deleteWorld(world);
+        CLife.getInstance().getActiveMatches().remove(this);
+        getActiveMatchesById().remove(getId());
+
+        getPlayerTimes().clear();
+        getAvailablePlayers().clear();
+        getLastAttacker().clear();
+        CLife.getInstance().getServer().getPluginManager().callEvent(new MatchEndEvent(Match.this));
+        winner = null;
+    }
+
     private void selectPlayersForMatch() {
         Collections.shuffle(getAvailablePlayers());
 
@@ -205,8 +169,7 @@ public class Match {
     }
 
     private void startPlayerCountdown() {
-        setStatus(GameState.PLAYING);
-        LifeUtils.setWorldBorder(Objects.requireNonNull(Bukkit.getWorld(getId())).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
+        MatchUtils.setWorldBorder(Objects.requireNonNull(Bukkit.getWorld(getId())).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
 
         CLife.getInstance().getScheduler().runTaskTimer(() -> {
             synchronized (getPlayerTimes()) {
@@ -234,9 +197,6 @@ public class Match {
 
 
     private void startCountdown() {
-        setStatus(GameState.STARTING);
-        countdown = ConfigKeys.COUNTDOWN.getInt();
-
         getStartingPlayers().addAll(getPlayers());
 
         if (ConfigKeys.CHEST_ENABLED.getBoolean()) placeChests();
@@ -288,12 +248,11 @@ public class Match {
     }
 
     private void checkForWinner() {
-        long alivePlayers = getPlayers()
+        if (getPlayers()
                 .stream()
                 .filter(player -> getPlayerTimes().getOrDefault(player, 0) > 0)
-                .count();
+                .count() <= 1) {
 
-        if (alivePlayers <= 1) {
             winner = getPlayers()
                     .stream()
                     .filter(player -> getPlayerTimes().getOrDefault(player, 0) > 0)
@@ -387,70 +346,89 @@ public class Match {
     }
 
     private void placeChests() {
-        World world = Bukkit.getWorld(id);
-        Location center = Objects.requireNonNull(world).getSpawnLocation();
-        double radius = ConfigKeys.RADIUS.getInt();
-
         for (int i = 0; i < ConfigKeys.CHEST_COUNT.getInt(); i++) {
-            Location chestLocation = LifeUtils.findSafeLocation(center, radius);
+            Location chestLocation = MatchUtils.findSafeLocation(Objects.requireNonNull(Bukkit.getWorld(getId())).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
 
             if (chestLocation != null) {
-                World word = chestLocation.getWorld();
-                int x = chestLocation.getBlockX();
-                int z = chestLocation.getBlockZ();
-                int y = word.getHighestBlockYAt(x, z);
-                Location safeLocation = new Location(word, x, y + 1, z);
-                Block blockAbove = word.getBlockAt(safeLocation);
-                int retries = 5;
-
-                while (retries > 0 && blockAbove.getType() != Material.AIR) {
-                    safeLocation.setY(safeLocation.getY() + 1);
-                    blockAbove = word.getBlockAt(safeLocation);
-                    retries--;
-                }
-
-                if (blockAbove.getType() == Material.AIR) {
+                Location safeLocation = findSafeBlockLocation(chestLocation);
+                if (safeLocation != null) {
                     safeLocation.getBlock().setType(Material.CHEST);
-                    LifeUtils.fillChestWithLoot(safeLocation);
-                    chestLocations.add(safeLocation);
-                } else LifeLogger.warn("No safe location found for chest placement.");
-            } else LifeLogger.warn("No safe location found for chest placement.");
+                    MatchUtils.fillChestWithLoot(safeLocation);
+                    getChestLocations().add(safeLocation);
+                } else {
+                    LifeLogger.warn("No safe location found for chest placement.");
+                }
+            } else {
+                LifeLogger.warn("No safe location found for chest placement.");
+            }
         }
     }
 
     private void randomTeleport() {
-        World world = Bukkit.getWorld(getId());
-        Location center = Objects.requireNonNull(world).getSpawnLocation();
-        double radius = ConfigKeys.RADIUS.getInt();
-
         getPlayers().forEach(player -> {
-            Location teleportLocation = LifeUtils.findSafeLocation(center, radius);
+            Location teleportLocation = MatchUtils.findSafeLocation(Objects.requireNonNull(Bukkit.getWorld(getId())).getSpawnLocation(), ConfigKeys.RADIUS.getInt());
 
             if (teleportLocation != null) {
-                World world2 = teleportLocation.getWorld();
-                int x = teleportLocation.getBlockX();
-                int z = teleportLocation.getBlockZ();
-                int y = world2.getHighestBlockYAt(x, z);
-                Location safeLocation = new Location(world2, x, y + 1, z);
-                Block blockAbove = world2.getBlockAt(safeLocation);
+                Location safeLocation = findSafeBlockLocation(teleportLocation);
 
-                if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
-                else {
-                    int retries = 5;
-
-                    while (retries > 0 && blockAbove.getType() != Material.AIR) {
-                        safeLocation.setY(safeLocation.getY() + 1);
-                        blockAbove = world2.getBlockAt(safeLocation);
-                        retries--;
-                    }
-
-                    if (blockAbove.getType() == Material.AIR) player.teleport(safeLocation);
-                    else LifeLogger.warn("No safe location found for player " + player.getName());
-                }
-            } else {
-                LifeLogger.warn("No safe location found for player " + player.getName());
-            }
+                if (safeLocation != null) player.teleport(safeLocation);
+                else LifeLogger.warn("No safe location found for player " + player.getName());
+            } else LifeLogger.warn("No safe location found for player " + player.getName());
         });
+    }
+
+    private Location findSafeBlockLocation(@NotNull Location location) {
+        World world = location.getWorld();
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+        int y = world.getHighestBlockYAt(x, z);
+        Location safeLocation = new Location(world, x, y + 1, z);
+        Block blockAbove = world.getBlockAt(safeLocation);
+        int retries = 5;
+
+        while (retries > 0 && blockAbove.getType() != Material.AIR) {
+            safeLocation.setY(safeLocation.getY() + 1);
+            blockAbove = world.getBlockAt(safeLocation);
+            retries--;
+        }
+
+        return (blockAbove.getType() == Material.AIR) ? safeLocation : null;
+    }
+
+    private void clearChests() {
+        synchronized (getChestLocations()) {
+            getChestLocations().stream()
+                    .filter(location -> location.getWorld().equals(Bukkit.getWorld(id)))
+                    .forEach(location -> {
+                        Block block = location.getBlock();
+                        if (block.getType() != Material.AIR) block.setType(Material.AIR);
+                    });
+            getChestLocations().removeIf(location -> location.getWorld().equals(Bukkit.getWorld(id)));
+        }
+    }
+
+    private void teleportAndResetPlayers(@NotNull List<Player> players) {
+        synchronized (getPlayers()) {
+            if (players == getPlayers()) players = new ArrayList<>(getPlayers());
+        }
+        synchronized (getSpectators()) {
+            if (players == getSpectators()) players = new ArrayList<>(getSpectators());
+        }
+
+        Iterator<Player> iterator = players.iterator();
+        while (iterator.hasNext()) {
+            Player player = iterator.next();
+            resetPlayer(player);
+            iterator.remove();
+        }
+    }
+
+    private void resetPlayer(@NotNull Player player) {
+        player.teleport(LifeUtils.convertStringToLocation(CLife.getInstance().getConfiguration().getString("lobby")));
+        player.getInventory().clear();
+        player.setGameMode(GameMode.SURVIVAL);
+        CLife.getInstance().getColorManager().removeColor(player);
+        ScoreboardService.removeMatchBoard(player);
     }
 }
 

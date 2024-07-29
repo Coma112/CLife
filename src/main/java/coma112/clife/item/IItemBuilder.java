@@ -1,7 +1,6 @@
 package coma112.clife.item;
 
 import coma112.clife.CLife;
-import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.processor.MessageProcessor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;

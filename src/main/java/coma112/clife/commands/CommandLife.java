@@ -1,14 +1,12 @@
 package coma112.clife.commands;
 
 import coma112.clife.CLife;
-import coma112.clife.config.Config;
 import coma112.clife.enums.Color;
-import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.queue.Queue;
 import coma112.clife.utils.LifeUtils;
-import org.bukkit.Bukkit;
+import coma112.clife.utils.MatchUtils;
 import org.bukkit.Difficulty;
 import org.bukkit.GameRule;
 import org.bukkit.World;
@@ -67,7 +65,7 @@ public class CommandLife {
     @Subcommand("stopall")
     @CommandPermission("clife.stopall")
     public void stopAll(@NotNull Player player) {
-        new ArrayList<>(CLife.getActiveMatches()).forEach(Match::endMatch);
+        new ArrayList<>(CLife.getInstance().getActiveMatches()).forEach(Match::endMatch);
         player.sendMessage(MessageKeys.SUCCESSFUL_STOPALL.getMessage());
     }
 
@@ -133,7 +131,7 @@ public class CommandLife {
             return;
         }
 
-        LifeUtils.updateMatchColor(match, player, target, color);
+        MatchUtils.updateMatchColor(match, player, target, color);
     }
 
     @Subcommand("setlobby")

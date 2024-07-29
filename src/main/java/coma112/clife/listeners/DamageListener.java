@@ -4,6 +4,8 @@ import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -15,6 +17,8 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+
+import java.util.Objects;
 
 public class DamageListener implements Listener {
     @EventHandler
@@ -75,12 +79,18 @@ public class DamageListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
+    public void onDeath(final PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+
+        player.setRespawnLocation(Objects.requireNonNull(Bukkit.getWorld(Match.getMatchById(player.getLocation().getWorld().getName()).getId())).getSpawnLocation(), true);
+    }
+
+    @EventHandler
     public void onRespawn(final PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        Match match = Match.getMatchById(player.getLocation().getWorld().getName());
 
-        if (match != null) CLife.getInstance().getScheduler().runTaskLater(() -> player.teleport(player.getWorld().getSpawnLocation()), 1);
+        player.teleport(Objects.requireNonNull(Bukkit.getWorld(Match.getMatchById(player.getLocation().getWorld().getName()).getId())).getSpawnLocation());
     }
 
     @EventHandler

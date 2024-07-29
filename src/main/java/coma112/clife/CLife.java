@@ -16,25 +16,30 @@ import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeLogger;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
-import static coma112.clife.utils.LifeUtils.loadBlockedBlocks;
+import static coma112.clife.utils.MatchUtils.loadBlockedBlocks;
 import static coma112.clife.utils.StartingUtils.*;
 
 public final class CLife extends JavaPlugin {
     @Getter private static CLife instance;
     @Getter private static AbstractDatabase database;
-    @Getter private static final Set<Match> activeMatches = new HashSet<>();
-    private static ColorManager colorManager;
-    private static Config config;
-    private static Language language;
-    private static TaskScheduler scheduler;
+    @Getter
+    private final Set<Match> activeMatches = new HashSet<>();
+    @Getter
+    private ColorManager colorManager;
+    @Getter
+    private Language language;
+    @Getter
+    private TaskScheduler scheduler;
+    private Config config;
 
     @Override
     public void onLoad() {
@@ -63,18 +68,6 @@ public final class CLife extends JavaPlugin {
 
     public Config getConfiguration() {
         return config;
-    }
-
-    public Language getLanguage() {
-        return language;
-    }
-
-    public ColorManager getColorManager() {
-        return colorManager;
-    }
-
-    public TaskScheduler getScheduler() {
-        return scheduler;
     }
 
     public Match getMatch(@NotNull Player player) {

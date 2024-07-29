@@ -1,6 +1,5 @@
 package coma112.clife.menu;
 
-import coma112.clife.CLife;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.item.IItemBuilder;
 import coma112.clife.utils.MenuUtils;

@@ -12,13 +12,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Queue {
-    @Getter public static final List<Player> queue  = Collections.synchronizedList(new ArrayList<>());
+    @Getter
+    public static final List<Player> queue = Collections.synchronizedList(new ArrayList<>());
     private static MyScheduledTask task;
 
     public static void addPlayerToQueue(@NotNull Player player) {

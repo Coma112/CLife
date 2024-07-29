@@ -1,13 +1,16 @@
 package coma112.clife.world;
 
 import coma112.clife.CLife;
-import coma112.clife.enums.keys.ConfigKeys;
-import coma112.clife.utils.LifeUtils;
+import coma112.clife.utils.MatchUtils;
 import lombok.Getter;
 import net.kyori.adventure.util.TriState;
-import org.bukkit.*;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.WorldType;
+import org.bukkit.GameRule;
 
 @Getter
 @SuppressWarnings("deprecation")
@@ -23,7 +26,7 @@ public class WorldGenerator {
     public static World generateWorld() {
         if (generated) return generatedWorld;
 
-        String uniqueID = LifeUtils.generateUniqueID();
+        String uniqueID = MatchUtils.generateUniqueID();
 
 
         WorldCreator creator = new WorldCreator(uniqueID);

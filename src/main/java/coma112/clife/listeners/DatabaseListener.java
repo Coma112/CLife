@@ -3,7 +3,6 @@ package coma112.clife.listeners;
 import coma112.clife.CLife;
 import coma112.clife.enums.keys.MessageKeys;
 import coma112.clife.managers.Match;
-import coma112.clife.services.ScoreboardService;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;

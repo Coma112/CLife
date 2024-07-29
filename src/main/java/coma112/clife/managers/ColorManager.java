@@ -1,13 +1,12 @@
 package coma112.clife.managers;
 
 import coma112.clife.CLife;
-import coma112.clife.enums.GameState;
+import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import coma112.clife.enums.Color;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +21,6 @@ public class ColorManager {
         if (match != null) {
             playerColors.put(player, color);
 
-            if (match.getStatus() == GameState.PLAYING) {
                 Bukkit.broadcastMessage(ConfigKeys.COLOR_BROADCAST
                         .getString()
                         .replace("{player}", player.getName())
@@ -34,7 +32,6 @@ public class ColorManager {
 
                         .getString()
                         .replace("{color}", color.getName()));
-            }
         }
     }
 
