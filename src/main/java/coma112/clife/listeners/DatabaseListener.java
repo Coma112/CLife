@@ -60,7 +60,7 @@ public class DatabaseListener implements Listener {
     @EventHandler
     public void onQuit(final PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Match match = CLife.getInstance().getMatch(player);
+        Match match = Match.getMatch(player);
 
         if (match == null) return;
 

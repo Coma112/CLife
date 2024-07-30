@@ -13,27 +13,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.Material;
-import java.util.HashSet;
+
+import java.util.*;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+
 import java.io.File;
 import java.security.SecureRandom;
-import java.util.List;
+import java.util.stream.IntStream;
+
 import org.bukkit.GameRule;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
+
 import static coma112.clife.enums.Color.getUpperLimit;
 
 public class MatchUtils {
-    @Getter
-    private static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    @Getter
-    private static final SecureRandom random = new SecureRandom();
-    @Getter
-    public static HashSet<Material> blockedBlocks = new HashSet<>();
+    @Getter private static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    @Getter public static HashSet<Material> blockedBlocks = new HashSet<>();
 
     public static void setWorldBorder(@NotNull Location center, double radius) {
         World world = center.getWorld();
@@ -104,12 +103,12 @@ public class MatchUtils {
 
     public static boolean isSafeLocation(@NotNull Location location) {
         World world = location.getWorld();
+
         if (world == null) return false;
 
         int x = location.getBlockX();
         int z = location.getBlockZ();
         int y = world.getHighestBlockYAt(x, z);
-
         Block block = world.getBlockAt(x, y, z);
         Block below = world.getBlockAt(x, y - 1, z);
         Block above = world.getBlockAt(x, y + 1, z);
@@ -117,16 +116,18 @@ public class MatchUtils {
         if (getBlockedBlocks().contains(block.getType())) return false;
         if (getBlockedBlocks().contains(below.getType())) return false;
 
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    Block adjacentBlock = world.getBlockAt(location.clone().add(dx, dy, dz));
-                    if (getBlockedBlocks().contains(adjacentBlock.getType())) return false;
-                }
-            }
-        }
+        boolean surroundingBlocksSafe = IntStream
+                .rangeClosed(-1, 1)
+                .boxed()
+                .flatMap(dx -> IntStream.rangeClosed(-1, 1)
+                        .boxed()
+                        .flatMap(dy -> IntStream.rangeClosed(-1, 1)
+                                .mapToObj(dz -> new int[]{dx, dy, dz})))
+                .map(offset -> location.clone().add(offset[0], offset[1], offset[2]))
+                .map(world::getBlockAt)
+                .noneMatch(b -> getBlockedBlocks().contains(b.getType()));
 
-        return above.getType() == Material.AIR;
+        return surroundingBlocksSafe && above.getType() == Material.AIR;
     }
 
     public static void loadBlockedBlocks() {
@@ -137,13 +138,11 @@ public class MatchUtils {
             return;
         }
 
-        for (String key : blockedBlocks) {
-            try {
-                Match.getBlockedBlocks().add(Material.valueOf(key.toUpperCase()));
-            } catch (IllegalArgumentException exception) {
-                LifeLogger.error(exception.getMessage());
-            }
-        }
+        blockedBlocks
+                .stream()
+                .map(String::toUpperCase)
+                .map(Material::valueOf)
+                .forEach(material -> Match.getBlockedBlocks().add(material));
     }
 
     public static void setupMatchWorld(@NotNull World world) {
@@ -165,10 +164,11 @@ public class MatchUtils {
         do {
             uniqueID = generateRandomID();
         } while (CLife.getDatabase().isIDExists(uniqueID));
+
         return uniqueID;
     }
 
-    public static void deleteWorld(World world) {
+    public static void deleteWorld(@Nullable World world) {
         if (world == null) {
             LifeLogger.warn("Cannot delete world because the world is null.");
             return;
@@ -176,9 +176,9 @@ public class MatchUtils {
 
         CLife.getInstance().getScheduler().runTask(() -> {
             Bukkit.unloadWorld(world, false);
-            File worldFolder = world.getWorldFolder();
             CLife.getDatabase().removeWorldID(world.getName());
-            deleteRecursively(worldFolder);
+
+            deleteRecursively(world.getWorldFolder());
         });
     }
 
@@ -186,9 +186,7 @@ public class MatchUtils {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
 
-            if (files != null) {
-                for (File f : files) deleteRecursively(f);
-            }
+            if (files != null) Arrays.stream(files).forEach(MatchUtils::deleteRecursively);
         }
 
         file.delete();
@@ -198,10 +196,9 @@ public class MatchUtils {
     private static String generateRandomID() {
         StringBuilder id = new StringBuilder();
 
-        for (int i = 0; i < 5; i++) {
-            int index = getRandom().nextInt(getAlphabet().length());
-            id.append(getAlphabet().charAt(index));
-        }
+        IntStream.range(0, 5)
+                .mapToObj(i -> getAlphabet().charAt(new SecureRandom().nextInt(getAlphabet().length())))
+                .forEach(id::append);
 
         return id.toString();
     }

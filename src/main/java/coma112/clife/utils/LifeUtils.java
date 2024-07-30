@@ -16,8 +16,6 @@ import java.util.Objects;
 public class LifeUtils {
     private static final String DEFAULT_SERIALIZED_LOCATION = Bukkit.getWorlds().getFirst().getName() + ";0;0;0;0.0;0.0";
     private static final Location DEFAULT_DESERIALIZED_LOCATION = new Location(Bukkit.getWorlds().getFirst(), 0.0, 0.0, 0.0, 0.0F, 0.0F);
-    @Getter private static double originalBorderSize;
-    @Getter private static Location originalBorderCenter;
 
     public static void sendActionBar(@NotNull Player player, @NotNull String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(MessageProcessor.process(message)));

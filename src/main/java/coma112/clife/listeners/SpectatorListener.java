@@ -6,6 +6,7 @@ import coma112.clife.enums.keys.ItemKeys;
 import coma112.clife.events.MatchSpectatorEvent;
 import coma112.clife.managers.Match;
 import coma112.clife.menu.menus.AvailablePlayersMenu;
+import coma112.clife.utils.LifeLogger;
 import coma112.clife.utils.MenuUtils;
 import io.papermc.paper.event.player.PlayerPickItemEvent;
 import org.bukkit.GameMode;
@@ -21,6 +22,7 @@ public class SpectatorListener implements Listener {
     @EventHandler
     public void onSpectator(final MatchSpectatorEvent event) {
         Player player = event.getPlayer();
+        LifeLogger.info("Player " + player.getName() + " became a spectator.");
 
         player.setGameMode(GameMode.ADVENTURE);
         player.setAllowFlight(true);
@@ -71,7 +73,7 @@ public class SpectatorListener implements Listener {
     }
 
     private boolean isSpectator(@NotNull Player player) {
-        Match match = CLife.getInstance().getMatch(player);
+        Match match = Match.getMatch(player);
 
         if (match == null) return false;
 

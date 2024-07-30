@@ -15,12 +15,12 @@ public class StartingUtils {
     }
 
     public static void saveResourceIfNotExists(@NotNull String resourcePath) {
-        if (!new File(CLife.getInstance().getDataFolder(), resourcePath).exists())
-            CLife.getInstance().saveResource(resourcePath, false);
+        if (!new File(CLife.getInstance().getDataFolder(), resourcePath).exists()) CLife.getInstance().saveResource(resourcePath, false);
     }
 
     public static void deleteWorlds() {
-        List<String> worldsOnServer = Bukkit.getWorlds().stream()
+        List<String> worldsOnServer = Bukkit.getWorlds()
+                .stream()
                 .map(World::getName)
                 .toList();
 

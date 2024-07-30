@@ -36,7 +36,7 @@ public class PlaceholderAPI extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(@NotNull Player player, @NotNull String params) {
-        Match match = CLife.getInstance().getMatch(player);
+        Match match = Match.getMatch(player);
 
         if (params.startsWith("topkillsplayer_")) {
             try {

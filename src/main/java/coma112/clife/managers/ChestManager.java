@@ -11,11 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class ChestManager {
-    private static final Random random = new Random();
-
     public static void generateLoot(@NotNull Inventory chestInventory, @NotNull String chestPath) {
         ConfigurationSection chestLootSection = CLife.getInstance().getConfiguration().getSection(chestPath);
         List<ItemStack> potentialLoot = new ArrayList<>();
@@ -25,25 +25,22 @@ public class ChestManager {
             return;
         }
 
-        for (String key : chestLootSection.getKeys(false)) {
-            ConfigurationSection itemSection = chestLootSection.getConfigurationSection(key);
+        chestLootSection
+                .getKeys(false)
+                .stream()
+                .map(chestLootSection::getConfigurationSection)
+                .filter(Objects::nonNull)
+                .forEach(itemSection -> {
+                    if (itemSection.getString("material") != null) {
+                        IntStream.range(0, itemSection.getInt("chance", 100))
+                                .mapToObj(i -> IItemBuilder.createItemFromSection(itemSection))
+                                .forEach(potentialLoot::add);
+                    }
+                });
 
-            if (itemSection == null) continue;
-
-            String materialName = itemSection.getString("material");
-            if (materialName == null) continue;
-
-            int chance = itemSection.getInt("chance", 100);
-
-            for (int i = 0; i < chance; i++) {
-                ItemStack item = IItemBuilder.createItemFromSection(itemSection);
-                potentialLoot.add(item);
-            }
-        }
-
-        for (int i = 0; i < ConfigKeys.LOOT_IN_ONE_CHEST.getInt() && !potentialLoot.isEmpty(); i++) {
-            ItemStack item = potentialLoot.remove(random.nextInt(potentialLoot.size()));
-            chestInventory.addItem(item);
-        }
+        IntStream
+                .range(0, Math.min(ConfigKeys.LOOT_IN_ONE_CHEST.getInt(), potentialLoot.size()))
+                .mapToObj(i -> potentialLoot.remove(new Random().nextInt(potentialLoot.size())))
+                .forEach(chestInventory::addItem);
     }
 }

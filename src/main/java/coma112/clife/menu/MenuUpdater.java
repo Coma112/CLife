@@ -2,6 +2,7 @@ package coma112.clife.menu;
 
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import coma112.clife.CLife;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("deprecation")
 public class MenuUpdater {
@@ -9,7 +10,7 @@ public class MenuUpdater {
     private boolean running = true;
     private MyScheduledTask task;
 
-    public MenuUpdater(Menu menu) {
+    public MenuUpdater(@NotNull Menu menu) {
         this.menu = menu;
     }
 

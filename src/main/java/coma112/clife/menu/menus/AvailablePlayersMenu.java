@@ -20,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @SuppressWarnings("deprecation")
 public class AvailablePlayersMenu extends PaginatedMenu implements Listener {
@@ -72,9 +73,7 @@ public class AvailablePlayersMenu extends PaginatedMenu implements Listener {
         }
 
         if (clickedIndex >= 0 && clickedIndex < players.size()) {
-            Player selectedPlayer = players.get(clickedIndex);
-
-            player.teleport(selectedPlayer.getLocation());
+            player.teleport(players.get(clickedIndex).getLocation());
             inventory.close();
         }
     }
@@ -90,15 +89,17 @@ public class AvailablePlayersMenu extends PaginatedMenu implements Listener {
         int startIndex = page * getMaxItemsPerPage();
         int endIndex = Math.min(startIndex + getMaxItemsPerPage(), players.size());
 
-        for (int index = startIndex; index < endIndex; index++) {
-            ItemStack playerItem = new ItemStack(Material.PLAYER_HEAD, 1);
-            ItemMeta playerMeta = playerItem.getItemMeta();
+        IntStream
+                .range(startIndex, endIndex)
+                .forEach(index -> {
+                    ItemStack playerItem = new ItemStack(Material.PLAYER_HEAD, 1);
+                    ItemMeta playerMeta = playerItem.getItemMeta();
 
-            playerMeta.setDisplayName(MessageProcessor.process("&a") + players.get(index).getName());
-            playerMeta.getPersistentDataContainer().set(new NamespacedKey(CLife.getInstance(), "uuid"), PersistentDataType.STRING, players.get(index).getUniqueId().toString());
-            playerItem.setItemMeta(playerMeta);
-            inventory.addItem(playerItem);
-        }
+                    playerMeta.setDisplayName(MessageProcessor.process("&a") + players.get(index).getName());
+                    playerMeta.getPersistentDataContainer().set(new NamespacedKey(CLife.getInstance(), "uuid"), PersistentDataType.STRING, players.get(index).getUniqueId().toString());
+                    playerItem.setItemMeta(playerMeta);
+                    inventory.addItem(playerItem);
+                });
     }
 
     @EventHandler

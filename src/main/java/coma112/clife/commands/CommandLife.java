@@ -51,7 +51,7 @@ public class CommandLife {
     public void stop(@NotNull Player player, @NotNull @Default("none") String id) {
         Match match;
 
-        if (id.equals("none")) match = CLife.getInstance().getMatch(player);
+        if (id.equals("none")) match = Match.getMatch(player);
         else match = Match.getMatchById(id);
 
         if (match == null) {
@@ -65,14 +65,14 @@ public class CommandLife {
     @Subcommand("stopall")
     @CommandPermission("clife.stopall")
     public void stopAll(@NotNull Player player) {
-        new ArrayList<>(CLife.getInstance().getActiveMatches()).forEach(Match::endMatch);
+        new ArrayList<>(Match.getActiveMatches()).forEach(Match::endMatch);
         player.sendMessage(MessageKeys.SUCCESSFUL_STOPALL.getMessage());
     }
 
     @Subcommand("change")
     @CommandPermission("clife.changetime")
     public void changeTime(@NotNull Player player, @NotNull @Default("me") Player target, @NotNull String prefix, int time) {
-        Match match = CLife.getInstance().getMatch(target);
+        Match match = Match.getMatch(target);
 
         if (match == null) return;
 
@@ -117,7 +117,7 @@ public class CommandLife {
     @Subcommand("setcolor")
     @CommandPermission("clife.setcolor")
     public void setColor(@NotNull Player player, @NotNull @Default("me") Player target, @NotNull Color color) {
-        Match match = CLife.getInstance().getMatch(target);
+        Match match = Match.getMatch(target);
 
         if (match == null) return;
 

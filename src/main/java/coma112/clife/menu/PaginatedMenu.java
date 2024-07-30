@@ -4,13 +4,14 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.item.IItemBuilder;
 import coma112.clife.utils.MenuUtils;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class PaginatedMenu extends Menu {
 
     protected int page = 0;
     @Getter protected int maxItemsPerPage = ConfigKeys.MENU_SIZE.getInt() - 2;
 
-    public PaginatedMenu(MenuUtils menuUtils) {
+    public PaginatedMenu(@NotNull MenuUtils menuUtils) {
         super(menuUtils);
     }
 

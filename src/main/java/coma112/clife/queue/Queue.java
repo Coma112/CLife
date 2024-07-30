@@ -29,6 +29,7 @@ public class Queue {
                 } else {
                     getQueue().add(player);
                     notifyQueuePlayersOnJoin();
+
                     if (task == null) startQueueActionBarUpdate();
                     if (getQueue().size() == ConfigKeys.QUEUE_MAX.getInt()) processQueue();
                 }
@@ -42,10 +43,10 @@ public class Queue {
                 getQueue().remove(player);
                 player.sendMessage(MessageKeys.REMOVE_FROM_QUEUE.getMessage());
                 notifyQueuePlayersOnLeave();
+
                 if (getQueue().size() >= ConfigKeys.QUEUE_MAX.getInt()) processQueue();
-            } else {
-                player.sendMessage(MessageKeys.NOT_IN_QUEUE.getMessage());
-            }
+
+            } else player.sendMessage(MessageKeys.NOT_IN_QUEUE.getMessage());
 
             if (getQueue().isEmpty() && task != null) {
                 task.cancel();
@@ -62,6 +63,7 @@ public class Queue {
 
             synchronized (getQueue()) {
                 if (getQueue().size() < ConfigKeys.QUEUE_MAX.getInt()) return;
+
                 playersToProcess = new ArrayList<>(getQueue().subList(0, ConfigKeys.QUEUE_MAX.getInt()));
 
                 getQueue().subList(0, ConfigKeys.QUEUE_MAX.getInt()).clear();

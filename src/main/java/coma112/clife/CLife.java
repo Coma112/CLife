@@ -31,14 +31,9 @@ import static coma112.clife.utils.StartingUtils.*;
 public final class CLife extends JavaPlugin {
     @Getter private static CLife instance;
     @Getter private static AbstractDatabase database;
-    @Getter
-    private final Set<Match> activeMatches = new HashSet<>();
-    @Getter
-    private ColorManager colorManager;
-    @Getter
-    private Language language;
-    @Getter
-    private TaskScheduler scheduler;
+    @Getter private ColorManager colorManager;
+    @Getter private Language language;
+    @Getter private TaskScheduler scheduler;
     private Config config;
 
     @Override
@@ -68,14 +63,6 @@ public final class CLife extends JavaPlugin {
 
     public Config getConfiguration() {
         return config;
-    }
-
-    public Match getMatch(@NotNull Player player) {
-        for (Match match : activeMatches) {
-            if (match.isInMatch(player)) return match;
-        }
-
-        return null;
     }
 
     private void initializeComponents() {

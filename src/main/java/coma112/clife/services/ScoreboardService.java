@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ScoreboardService {
-    @Getter public static final Map<Player, FastBoard> boards = new HashMap<>();
+    @Getter private static Map<Player, FastBoard> boards = new HashMap<>();
 
     private static void updateMatchBoard(@NotNull FastBoard board, @NotNull Player player) {
         board.updateLines(ConfigKeys.MATCH_SCOREBOARD_LINES.getScoreboardList(player));

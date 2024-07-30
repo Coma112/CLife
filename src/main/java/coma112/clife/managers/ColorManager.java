@@ -1,6 +1,5 @@
 package coma112.clife.managers;
 
-import coma112.clife.CLife;
 import coma112.clife.enums.Color;
 import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.utils.LifeUtils;
@@ -16,7 +15,7 @@ public class ColorManager {
     private final Map<Player, Color> playerColors = new ConcurrentHashMap<>();
 
     public void setColor(@NotNull Player player, @NotNull Color color) {
-        Match match = CLife.getInstance().getMatch(player);
+        Match match = Match.getMatch(player);
 
         if (match != null) {
             playerColors.put(player, color);
