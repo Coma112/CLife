@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public interface IItemBuilder {
     static IItemBuilder create(@NotNull Material material) {
@@ -80,7 +81,7 @@ public interface IItemBuilder {
         String name = section.getString("name");
         String[] loreArray = section.getStringList("lore").toArray(new String[0]);
 
-        for (int i = 0; i < loreArray.length; i++) loreArray[i] = MessageProcessor.process(loreArray[i]);
+        IntStream.range(0, loreArray.length).forEach(index -> loreArray[index] = MessageProcessor.process(loreArray[index]));
 
         return IItemBuilder.create(material, amount)
                 .setName(Objects.requireNonNull(name))

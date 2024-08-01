@@ -27,30 +27,26 @@ public class WorldGenerator {
         if (generated) return generatedWorld;
 
         String uniqueID = MatchUtils.generateUniqueID();
-
-
         WorldCreator creator = new WorldCreator(uniqueID);
-
         generatedWorld = Bukkit.createWorld(creator);
-
         Location spawnLocation = new Location(generatedWorld, 0, 70, 0);
         ChunkGenerator generator = new FixedSpawnChunkGenerator(spawnLocation);
 
+        creator.keepSpawnLoaded(TriState.byBoolean(false));
         creator.environment(World.Environment.NORMAL);
         creator.type(WorldType.NORMAL);
         creator.generator(generator);
-        creator.keepSpawnLoaded(TriState.byBoolean(false));
-
 
         if (generatedWorld != null) {
-            generatedWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
             generatedWorld.setKeepSpawnInMemory(false);
+            generatedWorld.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+
             generatedWorld.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
             generatedWorld.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
 
-                generatedWorld.getChunkAt(spawnLocation).load();
-                CLife.getDatabase().saveWorldID(uniqueID);
-                generated = true;
+            generatedWorld.getChunkAt(spawnLocation).load();
+            CLife.getDatabase().saveWorldID(uniqueID);
+            generated = true;
         }
 
         return generatedWorld;
