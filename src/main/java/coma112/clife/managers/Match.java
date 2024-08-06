@@ -70,6 +70,7 @@ public class Match {
 
     public void endMatch() {
         World world = Bukkit.getWorld(id);
+        
         if (matchEnded) return;
         matchEnded = true;
 

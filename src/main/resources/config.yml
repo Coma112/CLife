@@ -1,6 +1,6 @@
 # Every time is taken in seconds!
 
-language: "en" # Supported languages -> hu, de, en
+language: "en" # Supported languages -> hu, de, en, es
 time: 216000 # Starting time
 damage-per-half-heart: 120 # Time taken by half heart.
 add-time-per-half-heart: 60 # Time given by half heart
