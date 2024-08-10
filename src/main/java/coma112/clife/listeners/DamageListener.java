@@ -5,13 +5,9 @@ import coma112.clife.enums.keys.ConfigKeys;
 import coma112.clife.managers.Match;
 import coma112.clife.utils.LifeUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -25,6 +21,8 @@ public class DamageListener implements Listener {
     public void onEntityDamage(final EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player victim) {
             Match match = Match.getMatchById(victim.getLocation().getWorld().getName());
+
+            if (match == null) return;
 
             Player damager = null;
 
@@ -82,6 +80,9 @@ public class DamageListener implements Listener {
     @EventHandler
     public void onDeath(final PlayerDeathEvent event) {
         Player player = event.getPlayer();
+        Match match = Match.getMatch(player);
+
+        if (match == null) return;
 
         player.setRespawnLocation(Objects.requireNonNull(Bukkit.getWorld(Match.getMatchById(player.getLocation().getWorld().getName()).getId())).getSpawnLocation(), true);
     }
@@ -89,6 +90,9 @@ public class DamageListener implements Listener {
     @EventHandler
     public void onRespawn(final PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        Match match = Match.getMatch(player);
+
+        if (match == null) return;
 
         player.teleport(Objects.requireNonNull(Bukkit.getWorld(Match.getMatchById(player.getLocation().getWorld().getName()).getId())).getSpawnLocation());
     }
@@ -112,25 +116,23 @@ public class DamageListener implements Listener {
 
     @EventHandler
     public void onEntityExplode(final EntityExplodeEvent event) {
-        Match match = null;
-        for (Block block : event.blockList()) {
-            for (Player player : block.getWorld().getPlayers()) {
+        event.blockList().forEach(block -> {
+            block.getWorld().getPlayers().forEach(player -> {
                 if (player.getLocation().distance(block.getLocation()) < 5) {
-                    if (match == null) match = Match.getMatchById(player.getLocation().getWorld().getName());;
+                    Match match = Match.getMatchById(player.getLocation().getWorld().getName());
 
-                    if (match != null) {
-                        match.removeTime(player, (ConfigKeys.DAMAGE.getInt()));
-                        LifeUtils.sendTitle(player, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt()), "");
-                    }
+                    if (match == null) return;
+
+                    match.removeTime(player, (ConfigKeys.DAMAGE.getInt()));
+                    LifeUtils.sendTitle(player, "&4- " + LifeUtils.formatTime(ConfigKeys.DAMAGE.getInt()), "");
                 }
-            }
-        }
+            });
+        });
     }
 
     @EventHandler
     public void onEntityCombust(final EntityCombustEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof Player victim) {
+        if (event.getEntity() instanceof Player victim) {
             Match match = Match.getMatchById(victim.getLocation().getWorld().getName());
 
             if (match != null) {

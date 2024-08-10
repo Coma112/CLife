@@ -1,83 +1,117 @@
 package coma112.clife.hooks;
 
-import coma112.clife.events.MatchEndEvent;
-import coma112.clife.events.MatchKillEvent;
-import coma112.clife.events.MatchStartEvent;
+import coma112.clife.CLife;
+import coma112.clife.interfaces.PlaceholderProvider;
+import coma112.clife.utils.LifeLogger;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Arrays;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Data
 public class Webhook {
-    private final String url;
     private final List<EmbedObject> embeds = new ArrayList<>();
+    private String url;
+    @Setter
     private String content;
+    @Setter
     private String username;
+    @Setter
     private String avatarUrl;
-    @Setter private boolean tts;
+    @Setter
+    private boolean tts;
 
     public Webhook(@NotNull String url) {
         this.url = url;
     }
 
-    public void setContent(@NotNull String content) {
-        this.content = content;
+    public static void sendWebhookFromString(@NotNull String path, @NotNull PlaceholderProvider event) throws IOException, URISyntaxException {
+        ConfigurationSection section = CLife.getInstance().getConfiguration().getSection(path);
+
+        if (section == null) return;
+
+        boolean isEnabled = section.getBoolean("enabled", false);
+        String url = section.getString("url");
+        String description = Optional.ofNullable(section.getString("description")).orElse("");
+        String color = Optional.ofNullable(section.getString("color")).orElse("BLACK");
+        String authorName = Optional.ofNullable(section.getString("author-name")).orElse("");
+        String authorURL = Optional.ofNullable(section.getString("author-url")).orElse("");
+        String authorIconURL = Optional.ofNullable(section.getString("author-icon")).orElse("");
+        String footerText = Optional.ofNullable(section.getString("footer-text")).orElse("");
+        String footerIconURL = Optional.ofNullable(section.getString("footer-icon")).orElse("");
+        String thumbnailURL = Optional.ofNullable(section.getString("thumbnail")).orElse("");
+        String title = Optional.ofNullable(section.getString("title")).orElse("");
+        String imageURL = Optional.ofNullable(section.getString("image")).orElse("");
+
+        description = replacePlaceholders(description, event);
+        authorName = replacePlaceholders(authorName, event);
+        authorURL = replacePlaceholders(authorURL, event);
+        authorIconURL = replacePlaceholders(authorIconURL, event);
+        footerText = replacePlaceholders(footerText, event);
+        footerIconURL = replacePlaceholders(footerIconURL, event);
+        thumbnailURL = replacePlaceholders(thumbnailURL, event);
+        title = replacePlaceholders(title, event);
+        imageURL = replacePlaceholders(imageURL, event);
+
+        if (isEnabled && url != null && !url.isEmpty()) {
+            Webhook webhook = new Webhook(url);
+
+            try {
+                Color colorObj = (Color) Color.class.getField(color.toUpperCase()).get(null);
+
+                webhook.addEmbed(new Webhook.EmbedObject()
+                        .setDescription(description)
+                        .setColor(colorObj)
+                        .setFooter(footerText, footerIconURL)
+                        .setThumbnail(thumbnailURL)
+                        .setTitle(title)
+                        .setAuthor(authorName, authorURL, authorIconURL)
+                        .setImage(imageURL)
+                );
+            } catch (NoSuchFieldException | IllegalAccessException exception) {
+                LifeLogger.error(exception.getMessage());
+
+                webhook.addEmbed(new Webhook.EmbedObject()
+                        .setDescription(description)
+                        .setColor(Color.BLACK)
+                        .setFooter(footerText, footerIconURL)
+                        .setThumbnail(thumbnailURL)
+                        .setTitle(title)
+                        .setAuthor(authorName, authorURL, authorIconURL)
+                        .setImage(imageURL)
+                );
+            }
+
+            webhook.execute();
+        }
     }
 
-    public void setUsername(@NotNull String username) {
-        this.username = username;
-    }
-
-    public void setAvatarUrl(@NotNull String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    private static String replacePlaceholders(@NotNull String text, @NotNull PlaceholderProvider event) {
+        return event.getPlaceholders()
+                .entrySet()
+                .stream()
+                .reduce(text, (acc, entry) -> acc.replace(entry.getKey(), entry.getValue()), (s1, s2) -> s1);
     }
 
     public void addEmbed(@NotNull EmbedObject embed) {
         this.embeds.add(embed);
     }
 
-    public static void sendWebhook(@NotNull String url,
-                                   boolean isEnabled,
-                                   @NotNull String description,
-                                   @NotNull String color,
-                                   @NotNull String authorName,
-                                   @NotNull String authorURL,
-                                   @NotNull String authorIconURL,
-                                   @NotNull String footerText,
-                                   @NotNull String footerIconURL,
-                                   @NotNull String thumbnailURL,
-                                   @NotNull String title,
-                                   @NotNull String imageURL) throws IOException, NoSuchFieldException, IllegalAccessException {
-
-        if (isEnabled) {
-            Webhook webhook = new Webhook(url);
-
-            webhook.addEmbed(new Webhook.EmbedObject()
-                    .setDescription(description)
-                    .setColor((Color) Color.class.getField(color.toUpperCase()).get(null))
-                    .setFooter(footerText, footerIconURL)
-                    .setThumbnail(thumbnailURL)
-                    .setTitle(title)
-                    .setAuthor(authorName, authorURL, authorIconURL)
-                    .setImage(imageURL)
-            );
-
-            webhook.execute();
-        }
-    }
-
-    public void execute() throws IOException {
+    public void execute() throws IOException, URISyntaxException {
         if (this.content == null && this.embeds.isEmpty()) throw new IllegalArgumentException("Error!");
 
         JSONObject json = new JSONObject();
@@ -90,7 +124,7 @@ public class Webhook {
         if (!this.embeds.isEmpty()) {
             List<JSONObject> embedObjects = new ArrayList<>();
 
-            for (EmbedObject embed : this.embeds) {
+            this.embeds.forEach(embed -> {
                 JSONObject jsonEmbed = new JSONObject();
 
                 jsonEmbed.put("title", embed.getTitle());
@@ -99,12 +133,11 @@ public class Webhook {
 
                 if (embed.getColor() != null) {
                     Color color = embed.getColor();
+                    int red = color.getRed();
+                    red = (red << 8) + color.getGreen();
+                    red = (red << 8) + color.getBlue();
 
-                    int rgb = color.getRed();
-                    rgb = (rgb << 8) + color.getGreen();
-                    rgb = (rgb << 8) + color.getBlue();
-
-                    jsonEmbed.put("color", rgb);
+                    jsonEmbed.put("color", red);
                 }
 
                 EmbedObject.Footer footer = embed.getFooter();
@@ -146,7 +179,7 @@ public class Webhook {
 
                 List<JSONObject> jsonFields = new ArrayList<>();
 
-                for (EmbedObject.Field field : fields) {
+                fields.forEach(field -> {
                     JSONObject jsonField = new JSONObject();
 
                     jsonField.put("name", field.name());
@@ -154,30 +187,32 @@ public class Webhook {
                     jsonField.put("inline", field.inline());
 
                     jsonFields.add(jsonField);
-                }
+                });
+
                 jsonEmbed.put("fields", jsonFields.toArray());
                 embedObjects.add(jsonEmbed);
-            }
+            });
 
             json.put("embeds", embedObjects.toArray());
         }
 
-        URL url = new URL(this.url);
+        URI uri = new URI(this.url);
+        URL url = uri.toURL();
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+
         connection.addRequestProperty("Content-Type", "application/json");
         connection.addRequestProperty("User-Agent", "Java-Webhook");
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
 
         OutputStream stream = connection.getOutputStream();
+
         stream.write(json.toString().getBytes());
         stream.flush();
         stream.close();
-
         connection.getInputStream().close();
         connection.disconnect();
     }
-
 
     @Getter
     public static class EmbedObject {
@@ -236,33 +271,39 @@ public class Webhook {
             return this;
         }
 
-        private record Footer(@NotNull String text, @NotNull String iconUrl) {}
+        private record Footer(@NotNull String text, @NotNull String iconUrl) {
+        }
 
-        private record Thumbnail(@NotNull String url) {}
+        private record Thumbnail(@NotNull String url) {
+        }
 
-        private record Image(@NotNull String url) {}
+        private record Image(@NotNull String url) {
+        }
 
-        private record Author(@NotNull String name, @NotNull String url, @NotNull String iconUrl) {}
+        private record Author(@NotNull String name, @NotNull String url, @NotNull String iconUrl) {
+        }
 
-        private record Field(String name, String value, boolean inline) {
+        private record Field(@NotNull String name, @NotNull String value, boolean inline) {
         }
     }
 
     private static class JSONObject {
         private final HashMap<String, Object> map = new HashMap<>();
 
-        void put(String key, Object value) {
+        void put(@NotNull String key, @Nullable Object value) {
             if (value != null) map.put(key, value);
         }
 
         @Override
         public String toString() {
-            return "{" + map.entrySet().stream()
+            return "{" + map
+                    .entrySet()
+                    .stream()
                     .map(entry -> quote(entry.getKey()) + ": " + stringifyValue(entry.getValue()))
                     .collect(Collectors.joining(", ")) + "}";
         }
 
-        private String stringifyValue(Object value) {
+        private String stringifyValue(@Nullable Object value) {
             if (value instanceof String) return quote((String) value);
             if (value instanceof JSONArray) return quote(value.toString());
             if (value != null && value.getClass().isArray()) return arrayToString((Object[]) value);
@@ -275,31 +316,19 @@ public class Webhook {
             return "\"" + string.replace("\"", "\\\"") + "\"";
         }
 
-        private String arrayToString(Object[] array) {
-            return "[" + Arrays.stream(array)
+        private String arrayToString(@NotNull Object[] array) {
+            return "[" + Arrays
+                    .stream(array)
                     .map(element -> element instanceof String ? quote((String) element) : String.valueOf(element))
                     .collect(Collectors.joining(", ")) + "]";
         }
 
-        private String listToString(List<?> list) {
-            return "[" + list.stream()
+        private String listToString(@NotNull List<?> list) {
+            return "[" + list
+                    .stream()
                     .map(element -> element instanceof String ? quote((String) element) : String.valueOf(element))
                     .collect(Collectors.joining(", ")) + "]";
         }
-    }
-
-    public static String replacePlaceholdersMatchStart(@NotNull String text, final MatchStartEvent event) {
-        return text.replace("{count}", String.valueOf((long) event.getMatch().getPlayers().size()));
-    }
-
-    public static String replacePlaceholdersMatchEnd(@NotNull String text, final MatchEndEvent event) {
-        return text.replace("{winner}", event.getMatch().getWinner().getName());
-    }
-
-    public static String replacePlaceholdersMatchKill(@NotNull String text, final MatchKillEvent event) {
-        return text
-                .replace("{killer}", event.getKiller().getName())
-                .replace("{victim}", event.getVictim().getName());
     }
 }
 

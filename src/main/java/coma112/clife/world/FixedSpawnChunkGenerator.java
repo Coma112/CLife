@@ -10,7 +10,7 @@ import java.util.Random;
 public class FixedSpawnChunkGenerator extends ChunkGenerator {
     private final Location fixedSpawnLocation;
 
-    public FixedSpawnChunkGenerator(Location fixedSpawnLocation) {
+    public FixedSpawnChunkGenerator(@NotNull Location fixedSpawnLocation) {
         this.fixedSpawnLocation = fixedSpawnLocation;
     }
 
